@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 4: Empleados</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f1f5f9;
+            padding: 0;
+        }
+        .top-bar {
+            background: #1e293b;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .menu-container {
+            position: relative;
+        }
+        .menu-button {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+        .menu-button:hover {
+            background: #475569;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .menu-container:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 16px;
+            color: #1e293b;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-menu a:hover {
+            background: #f1f5f9;
+        }
+        .dropdown-menu a.active {
+            background: #1e293b;
+            color: white;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: #475569;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .subtitle {
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .btn-new {
+            padding: 12px 24px;
+            background: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(30, 41, 59, 0.2);
+            transition: all 0.3s;
+        }
+        .btn-new:hover {
+            background: #334155;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.3);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stat-info {
+            flex: 1;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: #475569;
+            color: white;
+        }
+        .filters {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .filter-input {
+            width: 100%;
+            padding: 12px 16px 12px 48px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8fafc;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: #475569;
+            background: white;
+        }
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .staff-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+        .staff-card:hover {
+            border-color: #475569;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .staff-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .staff-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            background: #475569;
+        }
+        .staff-info {
+            flex: 1;
+        }
+        .staff-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        .staff-role {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            background: #475569;
+        }
+        .staff-details {
+            margin-bottom: 16px;
+        }
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-active {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+        .staff-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .btn-icon {
+            padding: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #64748b;
+        }
+        .btn-icon:hover {
+            background: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="menu-container">
+            <button class="menu-button">
+                ☰ Menú
+            </button>
+            <div class="dropdown-menu">
+                <a href="#">👥 Clientes</a>
+                <a href="#">✂️ Servicios</a>
+                <a href="#" class="active">👨‍💼 Empleados</a>
+                <a href="#">📅 Citas</a>
+                <a href="#">📊 Dashboard</a>
+                <a href="#">⚙️ Configuración</a>
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="avatar">AD</div>
+            <span>Admin</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Staff</h1>
+                <p class="subtitle">Administra el personal de la barbería</p>
+            </div>
+            <button class="btn-new">+ Nuevo Empleado</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-info">
+                    <div class="stat-label">Total Staff</div>
+                    <div class="stat-value">5</div>
+                </div>
+                <div class="stat-icon">👥</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <div class="stat-label">Active</div>
+                    <div class="stat-value">4</div>
+                </div>
+                <div class="stat-icon">✅</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <div class="stat-label">Barbers</div>
+                    <div class="stat-value">3</div>
+                </div>
+                <div class="stat-icon">✂️</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-info">
+                    <div class="stat-label">Receptionists</div>
+                    <div class="stat-value">1</div>
+                </div>
+                <div class="stat-icon">👤</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <input type="text" class="filter-input" placeholder="🔍 Buscar por nombre, email, teléfono...">
+            <select class="filter-input">
+                <option>🛡️ Todos los roles</option>
+                <option>Administrador</option>
+                <option>Barbero</option>
+                <option>Recepcionista</option>
+            </select>
+        </div>
+
+        <div class="staff-grid">
+            <div class="staff-card">
+                <div class="staff-header">
+                    <div class="staff-avatar">CR</div>
+                    <div class="staff-info">
+                        <div class="staff-name">Carlos Rodríguez</div>
+                        <span class="staff-role">Barber</span>
+                    </div>
+                </div>
+                <div class="staff-details">
+                    <div class="detail-row">📧 carlos@barberia.com</div>
+                    <div class="detail-row">📞 555-1111</div>
+                    <div class="detail-row">💼 Especialidad: Corte + Barba</div>
+                    <div class="detail-row">
+                        <span class="badge badge-active">✅ Active</span>
+                    </div>
+                </div>
+                <div class="staff-actions">
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">🗑️</button>
+                </div>
+            </div>
+
+            <div class="staff-card">
+                <div class="staff-header">
+                    <div class="staff-avatar">AD</div>
+                    <div class="staff-info">
+                        <div class="staff-name">Ana Díaz</div>
+                        <span class="staff-role">Administrator</span>
+                    </div>
+                </div>
+                <div class="staff-details">
+                    <div class="detail-row">📧 ana@barberia.com</div>
+                    <div class="detail-row">📞 555-2222</div>
+                    <div class="detail-row">
+                        <span class="badge badge-active">✅ Active</span>
+                    </div>
+                </div>
+                <div class="staff-actions">
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">🗑️</button>
+                </div>
+            </div>
+
+            <div class="staff-card">
+                <div class="staff-header">
+                    <div class="staff-avatar">MR</div>
+                    <div class="staff-info">
+                        <div class="staff-name">María Ruiz</div>
+                        <span class="staff-role">Receptionist</span>
+                    </div>
+                </div>
+                <div class="staff-details">
+                    <div class="detail-row">📧 maria@barberia.com</div>
+                    <div class="detail-row">📞 555-3333</div>
+                    <div class="detail-row">
+                        <span class="badge badge-active">✅ Active</span>
+                    </div>
+                </div>
+                <div class="staff-actions">
+                    <button class="btn-icon">✏️</button>
+                    <button class="btn-icon">🗑️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,933 @@
+/* ========================================
+   ESTILOS GLOBALES - Configuración
+   ======================================== */
+
+.configuracion-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.configuracion-header {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 3px solid #1a1a1a;
+  background: transparent;;
+  padding-left: 16px;
+  border-radius: 8px 8px 0 0;
+}
+
+.configuracion-title {
+  font-size: 34px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  font-family: serif;
+  letter-spacing: 0.5px;
+}
+
+.configuracion-subtitle {
+  color: #4a4a4a;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.configuracion-content {
+  background: #ffffff;;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(26, 26, 26, 0.15);
+  border: 1px solid #e8e8e8;
+  border-top: 3px solid #1a1a1a;
+  overflow: hidden;
+}
+
+/* Tabs de Navegación */
+.config-tabs {
+  display: flex;
+  border-bottom: 2px solid rgba(26, 26, 26, 0.3);
+  background: #f5f5f5;;
+  padding: 0;
+  margin: 0;
+}
+
+.config-tab {
+  flex: 1;
+  padding: 16px 24px;
+  border: none;
+  background: transparent;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.config-tab:hover {
+  background: rgba(26, 26, 26, 0.08);
+  color: #1a1a1a;
+}
+
+.config-tab.active {
+  color: #1a1a1a;
+  border-bottom-color: #1a1a1a;
+  background: white;
+  font-weight: 700;
+}
+
+.config-section {
+  padding: 24px;
+}
+
+.section-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid rgba(26, 26, 26, 0.3);
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+  font-family: serif;
+}
+
+.section-description {
+  color: #4a4a4a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ========================================
+   ESTILOS DE FORMULARIOS - Global
+   ======================================== */
+
+/* Form Styling */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #d0d0d0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #000000;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.form-input:hover:not(:disabled) {
+  border-color: #4a4a4a;
+}
+
+.form-input:disabled {
+  background: #f5f5f5 !important;
+  color: #999999 !important;
+  cursor: not-allowed;
+}
+
+/* Select/Option Styling */
+.form-input option {
+  background: #ffffff;
+  color: #000000;
+  padding: 10px;
+  border: none;
+  font-weight: 500;
+}
+
+.form-input option:hover {
+  background: #e8e8e8;
+  color: #000000;
+}
+
+.form-input option:checked {
+  background: #000000;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Form Grid Layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.form-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ========================================
+   DARK MODE - Estilos Globales
+   ======================================== */
+
+html[data-theme="dark"] .configuracion-content {
+  background: #0f172a;
+  border-color: #1f2937;
+  border-top-color: #38bdf8;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(226, 232, 240, 0.08);
+}
+
+html[data-theme="dark"] .configuracion-header {
+  border-bottom-color: #334155;
+}
+
+html[data-theme="dark"] .configuracion-title {
+  color: #e5e7eb;
+}
+
+html[data-theme="dark"] .configuracion-subtitle {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .config-tabs {
+  background: #111827;
+  border-bottom-color: #1f2937;
+}
+
+html[data-theme="dark"] .config-tab {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .config-tab:hover {
+  background: rgba(27, 4, 4, 0.878);
+  color: #e5e7eb;
+}
+
+html[data-theme="dark"] .config-tab.active {
+  color: #ffffff;
+  border-bottom-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+html[data-theme="dark"] .section-header {
+  border-bottom-color: #1f2937;
+}
+
+html[data-theme="dark"] .section-title {
+  color: #e5e7eb;
+}
+
+html[data-theme="dark"] .section-description {
+  color: #cbd5e1;
+}
+
+/* Formularios en Dark Mode - usa reglas globales de darkMode.css */
+html[data-theme="dark"] .form-label {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: #4a4a4a;
+}
+
+.access-denied {
+  background: #ffffff;;
+  border-radius: 12px;
+  padding: 48px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(26, 26, 26, 0.15);
+  border: 1px solid #e8e8e8;
+  border-top: 3px solid #1a1a1a;
+}
+
+.access-denied h2 {
+  font-size: 24px;
+  color: #ef4444;
+  margin-bottom: 16px;
+}
+
+.access-denied p {
+  color: #64748b;
+  font-size: 16px;
+}
+
+.alert {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border-left: 4px solid;
+}
+
+.alert-error {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+
+.alert-error p {
+  color: #991b1b;
+  margin: 0;
+  font-weight: 500;
+}
+
+.alert-success {
+  background: #d1fae5;
+  border-color: #059669;
+}
+
+.alert-success p {
+  color: #064e3b;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ========================================
+   VISTA 1: HORARIOS DE TRABAJO
+   ======================================== */
+
+.horarios-table {
+  margin-bottom: 24px;
+}
+
+.table-header-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 1.5fr;
+  gap: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 1.5fr;
+  gap: 16px;
+  padding: 20px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.table-row:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.table-row.inactive {
+  opacity: 0.6;
+  background: #f1f5f9;
+}
+
+.table-cell {
+  display: flex;
+  align-items: center;
+}
+
+.header-cell {
+  font-weight: 600;
+  color: #475569;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Días de la Semana */
+.dia-label {
+  font-size: 16px;
+  color: #1e293b;
+}
+
+/* Dark Mode - Días en Horarios de Trabajo */
+html[data-theme="dark"] .dia-label,
+html[data-theme="dark"] .dia-label strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+html[data-theme="dark"] .table-row:focus-within .dia-label,
+html[data-theme="dark"] .table-row:focus-within .dia-label strong {
+  color: #000000;
+}
+
+html[data-theme="dark"] .table-row:hover .dia-label,
+html[data-theme="dark"] .table-row:hover .dia-label strong {
+  color: #000000;
+}
+
+html[data-theme="dark"] .table-row:hover .toggle-label {
+  color: #000000 !important;
+}
+
+/* Inputs de Horarios */
+.time-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  color: #1e293b;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #475569;
+  box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.1);
+}
+
+.time-input:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* Toggle Switch para estado del día */
+.toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch input[type="checkbox"] {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  appearance: none;
+  background: #cbd5e1;
+  border-radius: 12px;
+  outline: none;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+.toggle-switch input[type="checkbox"]:checked {
+  background: #059669;
+}
+
+.toggle-switch input[type="checkbox"]:before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background: white;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-switch input[type="checkbox"]:checked:before {
+  transform: translateX(24px);
+}
+
+.toggle-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #325c97;
+}
+
+/* Botón Aplicar a Todos */
+.btn-apply {
+  padding: 8px 16px;
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-apply:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+/* ========================================
+   VISTA 2: INFORMACIÓN DEL NEGOCIO
+   ======================================== */
+
+.config-negocio .section-header {
+  border-bottom: 2px solid #0f6ea9;
+  padding-bottom: 16px;
+}
+
+.config-negocio .section-title {
+  color: #1e293b;
+  font-weight: 800;
+  font-size: 24px;
+}
+
+.config-negocio .section-description {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.config-negocio .form-group {
+  margin-bottom: 20px;
+}
+
+.config-negocio .form-label {
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.config-negocio .form-input,
+.config-negocio .form-textarea {
+  background: #f8fafc !important;
+  color: #1e293b !important;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.config-negocio .form-input:focus,
+.config-negocio .form-textarea:focus {
+  border-color: #0f6ea9;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  background: #ffffff !important;
+}
+
+.config-negocio .form-input:hover:not(:disabled),
+.config-negocio .form-textarea:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background: #ffffff !important;
+}
+
+/* Dark Mode - Información del Negocio */
+html[data-theme="dark"] .config-negocio .section-header {
+  border-bottom-color: #0f6ea9;
+}
+
+html[data-theme="dark"] .config-negocio .section-title {
+  color: #0f6ea9;
+  text-shadow: 0 0 8px rgba(15, 110, 169, 0.25);
+}
+
+html[data-theme="dark"] .config-negocio .section-description {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .config-negocio .form-label {
+  color: #0f6ea9 !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .config-negocio .form-input,
+html[data-theme="dark"] .config-negocio .form-textarea {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border: 2px solid #0f6ea9;
+  font-weight: 600;
+}
+
+html[data-theme="dark"] .config-negocio .form-input:focus,
+html[data-theme="dark"] .config-negocio .form-textarea:focus {
+  border-color: #0f6ea9;
+  box-shadow: 0 0 0 3px rgba(15, 110, 169, 0.25);
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .config-negocio .form-input:hover:not(:disabled),
+html[data-theme="dark"] .config-negocio .form-textarea:hover:not(:disabled) {
+  border-color: #0f6ea9;
+  background: #1e293b !important;
+}
+
+/* ========================================
+   VISTA 4: CONFIGURACIÓN DE NOTIFICACIONES
+   ======================================== */
+
+.config-notificaciones .section-header {
+  border-bottom: 2px solid #1175d9;
+  padding-bottom: 16px;
+}
+
+.config-notificaciones .section-title {
+  color: #1e293b;
+  font-weight: 800;
+  font-size: 24px;
+}
+
+.config-notificaciones .section-description {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.config-notificaciones .form-group {
+  margin-bottom: 20px;
+}
+
+.config-notificaciones .form-label {
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.config-notificaciones .form-input {
+  background: #105aa4 !important;
+  color: #1e293b !important;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.config-notificaciones .form-input:focus {
+  border-color: #1175d9;
+  box-shadow: 0 0 0 3px rgba(17, 117, 217, 0.15);
+  background: #ffffff !important;
+}
+
+.config-notificaciones .form-input:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background: #ffffff !important;
+}
+
+/* Checkboxes en Notificaciones */
+.config-notificaciones .form-checkbox-label {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.config-notificaciones .form-checkbox-label span {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.config-notificaciones input[type="checkbox"] {
+  accent-color: #1175d9;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+}
+
+.config-notificaciones input[type="checkbox"]:checked {
+  background-color: #1175d9;
+  border-color: #1175d9;
+}
+
+html[data-theme="dark"] .config-notificaciones .section-header {
+  border-bottom-color: #1175d9;
+}
+
+html[data-theme="dark"] .config-notificaciones .section-title {
+  color: #1175d9;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.25);
+}
+
+html[data-theme="dark"] .config-notificaciones .section-description {
+  color: #0e52a4;
+}
+
+html[data-theme="dark"] .config-notificaciones .form-label {
+  color: #6b7c8d !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .config-notificaciones .form-checkbox-label {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+}
+
+html[data-theme="dark"] .config-notificaciones .form-checkbox-label span {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="dark"] .config-notificaciones .form-input {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border: 2px solid #1175d9;
+  font-weight: 600;
+}
+
+html[data-theme="dark"] .config-notificaciones .form-input:focus {
+  border-color: #1175d9;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.25);
+  background: #1e293b !important;
+  color: #145ba1 !important;
+}
+
+html[data-theme="dark"] .config-notificaciones .form-input:hover:not(:disabled) {
+  border-color: #1175d9;
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .config-notificaciones input[type="checkbox"] {
+  accent-color: #60a5fa;
+}
+
+html[data-theme="dark"] .config-notificaciones input[type="checkbox"]:checked {
+  background-color: #60a5fa;
+  border-color: #60a5fa;
+}
+
+
+/* ========================================
+   VISTA 3: CONFIGURACIÓN GENERAL
+   ======================================== */
+
+.config-general .section-header {
+  border-bottom: 2px solid #38bdf8;
+  padding-bottom: 16px;
+}
+
+.config-general .section-title {
+  color: #1e293b;
+  font-weight: 800;
+  font-size: 24px;
+}
+
+.config-general .section-description {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.config-general .form-group {
+  margin-bottom: 20px;
+}
+
+.config-general .form-label {
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.config-general .form-input {
+  background: #f8fafc !important;
+  color: #1e293b !important;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.config-general .form-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  background: #ffffff !important;
+}
+
+.config-general .form-input:hover:not(:disabled) {
+  border-color: #94a3b8;
+  background: #ffffff !important;
+}
+
+.config-general .form-input option {
+  background: #ffffff;
+  color: #1e293b;
+  font-weight: 500;
+  padding: 10px;
+}
+
+.config-general .form-input option:checked {
+  background: #1e293b;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Dark Mode - Configuración General */
+html[data-theme="dark"] .config-general .section-header {
+  border-bottom-color: #38bdf8;
+}
+
+html[data-theme="dark"] .config-general .section-title {
+  color: #60a5fa;
+  text-shadow: 0 0 8px rgba(96, 165, 250, 0.25);
+}
+
+html[data-theme="dark"] .config-general .section-description {
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .config-general .form-label {
+  color: #1175d9 !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .config-general .form-input {
+  background: #1e293b !important;
+  color: #f8fafc !important;
+  border: 2px solid #38bdf8;
+  font-weight: 600;
+}
+
+html[data-theme="dark"] .config-general .form-input:focus {
+  border-color: #7dd3fc;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+  background: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .config-general .form-input:hover:not(:disabled) {
+  border-color: #7dd3fc;
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] .config-general .form-input option {
+  background: #1e293b;
+  color: #f8fafc;
+  font-weight: 600;
+  padding: 12px;
+}
+
+html[data-theme="dark"] .config-general .form-input option:checked {
+  background: #38bdf8;
+  color: #000000;
+  font-weight: 600;
+}
+
+/* ========================================
+   BOTONES Y ACCIONES - Global
+   ======================================== */
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 24px;
+  border-top: 2px solid #e2e8f0;
+  gap: 16px;
+}
+
+.btn-reset {
+  padding: 12px 24px;
+  background: white;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  color: #475569;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.btn-reset:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btn-save {
+  padding: 12px 32px;
+  background: #1e293b;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(30, 41, 59, 0.2);
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #334155;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.3);
+}
+
+.btn-save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========================================
+   RESPONSIVE - Todos los modos
+   ======================================== */
+@media (max-width: 968px) {
+  .table-header-row,
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .table-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .header-cell {
+    display: none;
+  }
+
+  .table-cell::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #2f507e;
+    font-size: 12px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-reset,
+  .btn-save {
+    width: 100%;
+  }
+}
+
+

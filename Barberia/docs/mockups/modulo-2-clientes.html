@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 2: Clientes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f1f5f9;
+            padding: 0;
+        }
+        .top-bar {
+            background: #1e293b;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .menu-container {
+            position: relative;
+        }
+        .menu-button {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+        .menu-button:hover {
+            background: #475569;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .menu-container:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 16px;
+            color: #1e293b;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-menu a:hover {
+            background: #f1f5f9;
+        }
+        .dropdown-menu a.active {
+            background: #1e293b;
+            color: white;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: #475569;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        h1 {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .subtitle {
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .btn-new {
+            padding: 12px 24px;
+            background: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(30, 41, 59, 0.2);
+            transition: all 0.3s;
+        }
+        .btn-new:hover {
+            background: #334155;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.3);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .search-bar {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 48px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8fafc;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #475569;
+            background: white;
+        }
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .table-header {
+            background: #1e293b;
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead {
+            background: #f8fafc;
+        }
+        th {
+            padding: 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar-small {
+            width: 48px;
+            height: 48px;
+            background: #475569;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .client-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .contact-info {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .visits-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .visits-count {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e293b;
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+        }
+        .visits-label {
+            font-size: 11px;
+            color: #64748b;
+        }
+        .visits-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 4px;
+            width: fit-content;
+        }
+        .visits-frequent {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .visits-regular {
+            background: #fef3c7;
+            color: #78350f;
+        }
+        .visits-new {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+        .last-visit {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-icon {
+            padding: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 6px;
+            color: #64748b;
+        }
+        .btn-icon:hover {
+            background: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="menu-container">
+            <button class="menu-button">
+                ☰ Menú
+            </button>
+            <div class="dropdown-menu">
+                <a href="#" class="active">👥 Clientes</a>
+                <a href="#">✂️ Servicios</a>
+                <a href="#">👨‍💼 Empleados</a>
+                <a href="#">📅 Citas</a>
+                <a href="#">📊 Dashboard</a>
+                <a href="#">⚙️ Configuración</a>
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="avatar">AD</div>
+            <span>Admin</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Clients</h1>
+                <p class="subtitle">Administra la información de tus clientes</p>
+            </div>
+            <button class="btn-new">+ Nuevo Cliente</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Clients</div>
+                <div class="stat-value">45</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Clients</div>
+                <div class="stat-value">42</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Visits</div>
+                <div class="stat-value">328</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. Visits/Client</div>
+                <div class="stat-value">7.3</div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" class="search-input" placeholder="🔍 Buscar por nombre, teléfono o email...">
+        </div>
+
+        <div class="table-container">
+            <div class="table-header">
+                👥 Clients List
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Contact</th>
+                        <th>Registration</th>
+                        <th>Visits</th>
+                        <th>Status</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="client-info">
+                                <div class="avatar-small">JP</div>
+                                <div>
+                                    <div class="client-name">Juan Pérez</div>
+                                    <div class="contact-info">Prefiere corte clásico...</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="contact-info">📞 555-1234</div>
+                            <div class="contact-info">📧 juan@email.com</div>
+                        </td>
+                        <td>
+                            <div class="contact-info">01/01/2024</div>
+                        </td>
+                        <td>
+                            <div class="visits-info">
+                                <div class="visits-count">
+                                    <span>12</span>
+                                    <span class="visits-label">visitas</span>
+                                </div>
+                                <span class="visits-badge visits-frequent">⭐ Cliente frecuente</span>
+                                <div class="last-visit">Última: 12/01/2024</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-active">✅ Active</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="client-info">
+                                <div class="avatar-small">MG</div>
+                                <div>
+                                    <div class="client-name">María García</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="contact-info">📞 555-5678</div>
+                            <div class="contact-info">📧 maria@email.com</div>
+                        </td>
+                        <td>
+                            <div class="contact-info">02/01/2024</div>
+                        </td>
+                        <td>
+                            <div class="visits-info">
+                                <div class="visits-count">
+                                    <span>8</span>
+                                    <span class="visits-label">visitas</span>
+                                </div>
+                                <span class="visits-badge visits-regular">Cliente regular</span>
+                                <div class="last-visit">Última: 10/01/2024</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-active">✅ Active</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="client-info">
+                                <div class="avatar-small">CL</div>
+                                <div>
+                                    <div class="client-name">Carlos López</div>
+                                    <div class="contact-info">Cliente desde 2023</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="contact-info">📞 555-9012</div>
+                            <div class="contact-info">📧 carlos@email.com</div>
+                        </td>
+                        <td>
+                            <div class="contact-info">15/12/2023</div>
+                        </td>
+                        <td>
+                            <div class="visits-info">
+                                <div class="visits-count">
+                                    <span>25</span>
+                                    <span class="visits-label">visitas</span>
+                                </div>
+                                <span class="visits-badge visits-frequent">⭐ VIP Cliente</span>
+                                <div class="last-visit">Última: 14/01/2024</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-active">✅ Active</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="client-info">
+                                <div class="avatar-small">AR</div>
+                                <div>
+                                    <div class="client-name">Ana Rodríguez</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="contact-info">📞 555-3456</div>
+                            <div class="contact-info">📧 ana@email.com</div>
+                        </td>
+                        <td>
+                            <div class="contact-info">05/01/2024</div>
+                        </td>
+                        <td>
+                            <div class="visits-info">
+                                <div class="visits-count">
+                                    <span>3</span>
+                                    <span class="visits-label">visitas</span>
+                                </div>
+                                <span class="visits-badge visits-new">Cliente nuevo</span>
+                                <div class="last-visit">Última: 11/01/2024</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-active">✅ Active</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="client-info">
+                                <div class="avatar-small">PM</div>
+                                <div>
+                                    <div class="client-name">Pedro Martínez</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="contact-info">📞 555-7890</div>
+                            <div class="contact-info">📧 pedro@email.com</div>
+                        </td>
+                        <td>
+                            <div class="contact-info">20/08/2023</div>
+                        </td>
+                        <td>
+                            <div class="visits-info">
+                                <div class="visits-count">
+                                    <span>1</span>
+                                    <span class="visits-label">visita</span>
+                                </div>
+                                <div class="last-visit">Última: 20/08/2023</div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge badge-active">✅ Active</span>
+                        </td>
+                        <td style="text-align: right;">
+                            <div class="actions">
+                                <button class="btn-icon">✏️</button>
+                                <button class="btn-icon">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

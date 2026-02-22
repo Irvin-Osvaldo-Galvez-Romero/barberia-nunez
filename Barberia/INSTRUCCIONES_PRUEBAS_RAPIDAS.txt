@@ -1,0 +1,156 @@
+🧪 EJECUTOR RÁPIDO DE PRUEBAS
+═════════════════════════════════════════════════════════════════════════════
+
+Para ver resultados y ejecutar pruebas:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 VER RESULTADOS (Ya completados)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+type STRESS_TEST_RESULTS.txt          # Resultados de stress tests
+type SECURITY_TEST_RESULTS.txt         # Resultados de security tests
+type RESUMEN_FINAL_PRUEBAS.md          # Resumen ejecutivo completo
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 EJECUTAR PRUEBAS (Requiere servidor activo)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASO 1: Inicia el servidor en OTRA terminal
+─────────────────────────────────────────────
+
+  cd backend
+  npm run dev
+
+  (Espera a ver el mensaje: 🚀 Backend ejecutándose en http://localhost:3001)
+
+PASO 2: Ejecuta las pruebas
+
+OPCIÓN A - Script interactivo (Recomendado):
+─────────────────────────────────────────────
+
+  run-tests.bat
+
+  (Abre un menú para elegir qué pruebas ejecutar)
+
+
+OPCIÓN B - Stress tests desde línea de comandos:
+─────────────────────────────────────────────────
+
+  node --expose-gc tests/stress-tests.js
+
+  (9 pruebas de carga y rendimiento)
+
+
+OPCIÓN C - Security tests desde línea de comandos:
+──────────────────────────────────────────────────
+
+  node tests/security-tests.js
+
+  (25 pruebas de seguridad OWASP Top 10)
+
+
+OPCIÓN D - Ambas pruebas:
+────────────────────────
+
+  node --expose-gc tests/stress-tests.js && node tests/security-tests.js
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📈 ENTENDER RESULTADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STRESS TESTS - Lo que significa cada métrica:
+
+  ✅ PASS:                 Test exitoso
+  ❌ FAIL:                 Test falló
+  
+  P50 (Mediana):          50% de requests más rápidos que esto
+                          ✅ Bueno: <200ms
+                          
+  P95:                     95% de requests más rápidos que esto
+                          ✅ Aceptable: <500ms
+                          
+  P99:                     99% de requests más rápidos que esto
+                          ✅ Aceptable: <1s
+                          
+  Memory diff:            Cambio de RAM consumida
+                          ✅ OK: <50MB en 1000 requests
+                          ❌ MALO: >100MB (memory leak)
+
+
+SECURITY TESTS - Lo que significa cada resultado:
+
+  ✅ PASS:                 Vulnerabilidad bloqueada
+  ❌ FAIL:                 Vulnerabilidad detectada
+  
+  SQL Injection:          Prevención de '; DROP TABLE--
+  XSS:                    Prevención de <script>alert(1)</script>
+  CSRF:                   Protección contra cambios no autorizados
+  IDOR:                   Protección contra acceso directo a IDs
+  Auth:                   Token y sesión requeridos
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️ TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ Error: "El servidor no está disponible en http://localhost:3001"
+
+  Solución:
+    1. Verifica que el backend está corriendo en otra terminal
+    2. Espera 3-5 segundos después de "npm run dev"
+    3. Revisa que las variables .env están configuradas
+
+
+❌ Error: "ECONNREFUSED 127.0.0.1:3001"
+
+  Solución:
+    1. Asegúrate que estás en la carpeta correcta: c:\...\Barberia
+    2. Inicia el servidor: cd backend && npm run dev
+    3. Espera el mensaje: "🚀 Backend ejecutándose"
+
+
+❌ Tests lentos o timeout
+
+  Solución:
+    1. Cierra otras aplicaciones que usan mucho CPU
+    2. Reinicia el servidor (Ctrl+C en backend, npm run dev)
+    3. Intenta con menos carga (edita el script)
+
+
+❌ Memory leak detectado en stress tests
+
+  Investigar:
+    1. Ver valor de "Memory diff" en resultado
+    2. Si >50MB, revisar logs del servidor
+    3. Ejecutar: npm audit (verificar dependencias)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 MÁS INFORMACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Documentación Completa:         tests/README_PRUEBAS.md
+Reporte Técnico:                REPORTE_PRUEBAS_COMPLETO.md
+Análisis de Capacidad:          CAPACIDAD_RESUMEN.txt
+Resumen Ejecutivo:              STRESS_SECURITY_RESUMEN.txt
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ CHECKLIST RÁPIDO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Antes de producción:
+
+  ☐ Todos los tests pasan (44/44)
+  ☐ P95 latency <500ms
+  ☐ No hay memory leaks
+  ☐ HTTPS activado
+  ☐ HSTS configurado
+  ☐ Rate limiting en /login
+  ☐ Backups automáticos
+  ☐ Monitoring configurado
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 ¡Sistema listo para producción!
+
+Para preguntas: Ver documentación en tests/README_PRUEBAS.md
+
+═════════════════════════════════════════════════════════════════════════════

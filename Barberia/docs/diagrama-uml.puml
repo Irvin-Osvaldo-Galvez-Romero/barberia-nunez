@@ -1,0 +1,362 @@
+@startuml SistemaBarberia
+
+' ============================================
+' DIAGRAMA DE CLASES - SISTEMA DE GESTIÓN DE BARBERÍA
+' ============================================
+
+package "Módulo de Clientes" {
+    class Cliente {
+        -id: int
+        -nombre: string
+        -telefono: string
+        -email: string
+        -fechaNacimiento: Date
+        -fechaRegistro: Date
+        -notas: string
+        -preferencias: string
+        -activo: boolean
+        +crear()
+        +actualizar()
+        +eliminar()
+        +buscar()
+        +obtenerHistorial()
+    }
+    
+    class HistorialCliente {
+        -id: int
+        -clienteId: int
+        -fechaServicio: Date
+        -servicioId: int
+        -barberoId: int
+        -precio: decimal
+        -notas: string
+        +agregarRegistro()
+        +obtenerRegistros()
+    }
+}
+
+package "Módulo de Citas" {
+    class Cita {
+        -id: int
+        -clienteId: int
+        -barberoId: int
+        -fechaHora: DateTime
+        -duracion: int
+        -estado: EstadoCita
+        -servicios: List<Servicio>
+        -notas: string
+        -fechaCreacion: DateTime
+        +crear()
+        +modificar()
+        +cancelar()
+        +confirmar()
+        +completar()
+    }
+    
+    enum EstadoCita {
+        PENDIENTE
+        CONFIRMADA
+        EN_PROCESO
+        COMPLETADA
+        CANCELADA
+        NO_ASISTIO
+    }
+    
+    class Calendario {
+        -fecha: Date
+        -barberoId: int
+        +obtenerDisponibilidad()
+        +bloquearHorario()
+        +liberarHorario()
+        +obtenerCitasDelDia()
+    }
+    
+    class Recordatorio {
+        -id: int
+        -citaId: int
+        -tipo: TipoRecordatorio
+        -enviado: boolean
+        -fechaEnvio: DateTime
+        +enviarSMS()
+        +enviarEmail()
+        +programar()
+    }
+    
+    enum TipoRecordatorio {
+        SMS
+        EMAIL
+        PUSH
+    }
+}
+
+package "Módulo de Servicios" {
+    class Servicio {
+        -id: int
+        -nombre: string
+        -descripcion: string
+        -precio: decimal
+        -duracion: int
+        -activo: boolean
+        -categoria: string
+        +crear()
+        +actualizar()
+        +eliminar()
+        +obtenerPrecio()
+    }
+    
+    class Paquete {
+        -id: int
+        -nombre: string
+        -descripcion: string
+        -precio: decimal
+        -servicios: List<Servicio>
+        -descuento: decimal
+        +crear()
+        +calcularPrecio()
+    }
+    
+    class Promocion {
+        -id: int
+        -nombre: string
+        -tipo: TipoDescuento
+        -valor: decimal
+        -fechaInicio: Date
+        -fechaFin: Date
+        -activa: boolean
+        +aplicar()
+        +validarVigencia()
+    }
+    
+    enum TipoDescuento {
+        PORCENTAJE
+        MONTO_FIJO
+    }
+}
+
+package "Módulo de Empleados" {
+    class Empleado {
+        -id: int
+        -nombre: string
+        -telefono: string
+        -email: string
+        -rol: Rol
+        -fechaContratacion: Date
+        -activo: boolean
+        -porcentajeComision: decimal
+        +crear()
+        +actualizar()
+        +obtenerHorario()
+        +calcularComision()
+    }
+    
+    enum Rol {
+        ADMINISTRADOR
+        BARBERO
+        RECEPCIONISTA
+    }
+    
+    class HorarioEmpleado {
+        -id: int
+        -empleadoId: int
+        -diaSemana: DiaSemana
+        -horaInicio: Time
+        -horaFin: Time
+        -activo: boolean
+        +obtenerHorario()
+        +actualizarHorario()
+    }
+    
+    enum DiaSemana {
+        LUNES
+        MARTES
+        MIERCOLES
+        JUEVES
+        VIERNES
+        SABADO
+        DOMINGO
+    }
+    
+    class RendimientoEmpleado {
+        -id: int
+        -empleadoId: int
+        -fecha: Date
+        -serviciosRealizados: int
+        -ingresosGenerados: decimal
+        -comisiones: decimal
+        +calcularRendimiento()
+        +obtenerEstadisticas()
+    }
+}
+
+package "Módulo de Punto de Venta" {
+    class Venta {
+        -id: int
+        -citaId: int
+        -clienteId: int
+        -fecha: DateTime
+        -subtotal: decimal
+        -descuento: decimal
+        -impuesto: decimal
+        -total: decimal
+        -metodoPago: MetodoPago
+        -propina: decimal
+        -estado: EstadoVenta
+        +crear()
+        +calcularTotal()
+        +aplicarDescuento()
+        +procesarPago()
+    }
+    
+    enum MetodoPago {
+        EFECTIVO
+        TARJETA_DEBITO
+        TARJETA_CREDITO
+        TRANSFERENCIA
+        EFECTIVO_DIGITAL
+    }
+    
+    enum EstadoVenta {
+        PENDIENTE
+        COMPLETADA
+        CANCELADA
+        REEMBOLSADA
+    }
+    
+    class ItemVenta {
+        -id: int
+        -ventaId: int
+        -servicioId: int
+        -cantidad: int
+        -precioUnitario: decimal
+        -subtotal: decimal
+    }
+    
+    class Recibo {
+        -id: int
+        -ventaId: int
+        -numeroRecibo: string
+        -fechaEmision: DateTime
+        -contenido: string
+        +generarPDF()
+        +imprimir()
+        +enviarPorEmail()
+    }
+}
+
+package "Módulo de Reportes" {
+    class Reporte {
+        -id: int
+        -tipo: TipoReporte
+        -fechaInicio: Date
+        -fechaFin: Date
+        -datos: JSON
+        +generar()
+        +exportarPDF()
+        +exportarExcel()
+    }
+    
+    enum TipoReporte {
+        INGRESOS
+        SERVICIOS_VENDIDOS
+        CLIENTES_FRECUENTES
+        RENDIMIENTO_EMPLEADOS
+        CITAS_CANCELADAS
+        HORARIOS_PICO
+    }
+    
+    class Estadistica {
+        -periodo: Periodo
+        -ingresos: decimal
+        -serviciosRealizados: int
+        -clientesAtendidos: int
+        -promedioTicket: decimal
+        +calcular()
+        +obtenerGraficos()
+    }
+    
+    enum Periodo {
+        DIARIO
+        SEMANAL
+        MENSUAL
+        ANUAL
+    }
+}
+
+package "Módulo de Configuración" {
+    class Configuracion {
+        -id: int
+        -clave: string
+        -valor: string
+        -tipo: TipoConfiguracion
+        +obtener()
+        +actualizar()
+    }
+    
+    enum TipoConfiguracion {
+        HORARIO_NEGOCIO
+        IMPUESTOS
+        MONEDA
+        ZONA_HORARIA
+        NOTIFICACIONES
+    }
+    
+    class Usuario {
+        -id: int
+        -empleadoId: int
+        -username: string
+        -password: string
+        -rol: Rol
+        -activo: boolean
+        -ultimoAcceso: DateTime
+        +autenticar()
+        +cambiarPassword()
+        +obtenerPermisos()
+    }
+    
+    class Permiso {
+        -id: int
+        -nombre: string
+        -descripcion: string
+        -modulo: string
+    }
+}
+
+' ============================================
+' RELACIONES ENTRE CLASES
+' ============================================
+
+Cliente ||--o{ HistorialCliente : tiene
+Cliente ||--o{ Cita : reserva
+Cliente ||--o{ Venta : realiza
+
+Empleado ||--o{ Cita : atiende
+Empleado ||--o{ HorarioEmpleado : tiene
+Empleado ||--o{ RendimientoEmpleado : genera
+Empleado ||--|| Usuario : tiene
+
+Cita ||--o{ Venta : genera
+Cita ||--o{ Recordatorio : tiene
+Cita }o--o{ Servicio : incluye
+Cita }o--|| EstadoCita : tiene
+
+Servicio ||--o{ ItemVenta : contiene
+Servicio }o--o{ Paquete : incluye
+
+Venta ||--|| Recibo : genera
+Venta ||--o{ ItemVenta : contiene
+Venta }o--|| MetodoPago : usa
+Venta }o--|| EstadoVenta : tiene
+
+Calendario }o--|| Empleado : pertenece
+Calendario ||--o{ Cita : muestra
+
+Promocion ..> Venta : aplica
+
+Reporte ..> Venta : analiza
+Reporte ..> Cita : analiza
+Reporte ..> Empleado : analiza
+Estadistica ..> Reporte : genera
+
+Usuario }o--o{ Permiso : tiene
+
+@enduml

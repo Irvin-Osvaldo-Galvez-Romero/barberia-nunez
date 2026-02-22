@@ -1,0 +1,241 @@
+{
+  "name": "Barbería - Backup Automático",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hour",
+              "hourInterval": 2
+            }
+          ]
+        }
+      },
+      "name": "Cron - Diario 2:00 AM",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 400]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM citas ORDER BY fecha_hora DESC;",
+        "options": {}
+      },
+      "name": "Exportar Citas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 200],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM clientes ORDER BY fecha_registro DESC;",
+        "options": {}
+      },
+      "name": "Exportar Clientes",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT id, nombre, telefono, email, rol, fecha_contratacion, activo, porcentaje_comision, especialidad, created_at, updated_at FROM empleados;",
+        "options": {}
+      },
+      "name": "Exportar Empleados",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 400],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM servicios ORDER BY nombre;",
+        "options": {}
+      },
+      "name": "Exportar Servicios",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 500],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM servicios_citas;",
+        "options": {}
+      },
+      "name": "Exportar Servicios-Citas",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 600],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM horarios_negocio ORDER BY dia_semana;",
+        "options": {}
+      },
+      "name": "Exportar Horarios",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 700],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM configuracion_general;",
+        "options": {}
+      },
+      "name": "Exportar Configuración",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 800],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combinar todos los datos exportados en un solo objeto JSON\nconst fecha = new Date().toISOString().split('T')[0];\nconst hora = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');\n\nconst backup = {\n  metadata: {\n    fecha_backup: new Date().toISOString(),\n    version: '1.0',\n    sistema: 'Barbería',\n    timestamp: Date.now()\n  },\n  datos: {\n    citas: $input.all()[0].json || [],\n    clientes: $input.all()[1].json || [],\n    empleados: $input.all()[2].json || [],\n    servicios: $input.all()[3].json || [],\n    servicios_citas: $input.all()[4].json || [],\n    horarios: $input.all()[5].json || [],\n    configuracion: $input.all()[6].json || []\n  },\n  estadisticas: {\n    total_citas: ($input.all()[0].json || []).length,\n    total_clientes: ($input.all()[1].json || []).length,\n    total_empleados: ($input.all()[2].json || []).length,\n    total_servicios: ($input.all()[3].json || []).length\n  }\n};\n\nconst filename = `backup-barberia-${fecha}_${hora}.json`;\n\nreturn {\n  json: {\n    backup: JSON.stringify(backup, null, 2),\n    filename: filename,\n    tamaño_kb: (JSON.stringify(backup).length / 1024).toFixed(2)\n  }\n};"
+      },
+      "name": "Generar Backup JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT email FROM empleados WHERE rol = 'ADMINISTRADOR' AND activo = true LIMIT 1;"
+      },
+      "name": "Obtener Email Admin",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 400],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "💾 Backup Automático de Base de Datos - {{ new Date().toLocaleDateString('es-MX') }}",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }\n    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }\n    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }\n    .info { background: #f9f9f9; padding: 15px; border-left: 4px solid #667eea; margin: 15px 0; }\n    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }\n    .stat-box { background: #e8f5e9; padding: 15px; border-radius: 8px; text-align: center; }\n    .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h2>💾 Backup Automático</h2>\n      <p>Base de Datos de Barbería</p>\n    </div>\n    <p>Se ha generado el backup automático de la base de datos.</p>\n    <div class=\"info\">\n      <p><strong>📅 Fecha:</strong> {{ new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</p>\n      <p><strong>🕐 Hora:</strong> {{ new Date().toLocaleTimeString('es-MX') }}</p>\n      <p><strong>📦 Archivo:</strong> {{ $node['Generar Backup JSON'].json.filename }}</p>\n      <p><strong>💽 Tamaño:</strong> {{ $node['Generar Backup JSON'].json.tamaño_kb }} KB</p>\n    </div>\n    <h3>📊 Estadísticas del Backup:</h3>\n    <div class=\"stats\">\n      <div class=\"stat-box\">\n        <h4>{{ JSON.parse($node['Generar Backup JSON'].json.backup).estadisticas.total_citas }}</h4>\n        <p>Citas</p>\n      </div>\n      <div class=\"stat-box\">\n        <h4>{{ JSON.parse($node['Generar Backup JSON'].json.backup).estadisticas.total_clientes }}</h4>\n        <p>Clientes</p>\n      </div>\n      <div class=\"stat-box\">\n        <h4>{{ JSON.parse($node['Generar Backup JSON'].json.backup).estadisticas.total_empleados }}</h4>\n        <p>Empleados</p>\n      </div>\n      <div class=\"stat-box\">\n        <h4>{{ JSON.parse($node['Generar Backup JSON'].json.backup).estadisticas.total_servicios }}</h4>\n        <p>Servicios</p>\n      </div>\n    </div>\n    <p style=\"color: #666; font-size: 14px;\">El archivo de backup está adjunto a este correo. Guárdalo en un lugar seguro.</p>\n    <div class=\"footer\">\n      <p>Sistema de Barbería © 2026</p>\n      <p>Este es un backup automático programado</p>\n    </div>\n  </div>\n</body>\n</html>",
+        "attachments": "={{ $node['Generar Backup JSON'].json.filename }}",
+        "options": {
+          "attachmentsData": "={{ $node['Generar Backup JSON'].json.backup }}"
+        }
+      },
+      "name": "Gmail - Enviar Backup",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [1050, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Registrar backup en tabla de logs (opcional)\nINSERT INTO backup_logs (fecha, archivo, tamaño_kb, status)\nVALUES (NOW(), '{{ $node[\"Generar Backup JSON\"].json.filename }}', {{ $node[\"Generar Backup JSON\"].json.tamaño_kb }}, 'EXITOSO');"
+      },
+      "name": "Registrar en Logs",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1250, 400],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron - Diario 2:00 AM": {
+      "main": [
+        [
+          {"node": "Exportar Citas", "type": "main", "index": 0},
+          {"node": "Exportar Clientes", "type": "main", "index": 0},
+          {"node": "Exportar Empleados", "type": "main", "index": 0},
+          {"node": "Exportar Servicios", "type": "main", "index": 0},
+          {"node": "Exportar Servicios-Citas", "type": "main", "index": 0},
+          {"node": "Exportar Horarios", "type": "main", "index": 0},
+          {"node": "Exportar Configuración", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Exportar Citas": {
+      "main": [[{"node": "Generar Backup JSON", "type": "main", "index": 0}]]
+    },
+    "Exportar Clientes": {
+      "main": [[{"node": "Generar Backup JSON", "type": "main", "index": 0}]]
+    },
+    "Exportar Empleados": {
+      "main": [[{"node": "Generar Backup JSON", "type": "main", "index": 0}]]
+    },
+    "Exportar Servicios": {
+      "main": [[{"node": "Generar Backup JSON", "type": "main", "index": 0}]]
+    },
+    "Exportar Servicios-Citas": {
+      "main": [[{"node": "Generar Backup JSON", "type": "main", "index": 0}]]
+    },
+    "Exportar Horarios": {
+      "main": [[{"node": "Generar Backup JSON", "type": "main", "index": 0}]]
+    },
+    "Exportar Configuración": {
+      "main": [[{"node": "Generar Backup JSON", "type": "main", "index": 0}]]
+    },
+    "Generar Backup JSON": {
+      "main": [[{"node": "Obtener Email Admin", "type": "main", "index": 0}]]
+    },
+    "Obtener Email Admin": {
+      "main": [[{"node": "Gmail - Enviar Backup", "type": "main", "index": 0}]]
+    },
+    "Gmail - Enviar Backup": {
+      "main": [[{"node": "Registrar en Logs", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "4"
+}

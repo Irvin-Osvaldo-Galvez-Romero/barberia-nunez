@@ -1,0 +1,285 @@
+{
+  "name": "Barbería - CRUD con Google Calendar Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cita/crear",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook - Crear Cita",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "crear-cita"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO citas (cliente_id, barbero_id, fecha_hora, duracion, estado, notas)\nVALUES ('{{ $json.cliente_id }}', '{{ $json.barbero_id }}', '{{ $json.fecha_hora }}', {{ $json.duracion }}, 'PENDIENTE', '{{ $json.notas }}')\nRETURNING *;",
+        "options": {}
+      },
+      "name": "Supabase - Insertar Cita",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO servicios_citas (cita_id, servicio_id, precio)\nSELECT '{{ $node[\"Supabase - Insertar Cita\"].json.id }}', unnest(ARRAY{{ $node[\"Webhook - Crear Cita\"].json.servicios }}::uuid[]), \n       (SELECT precio FROM servicios WHERE id = unnest(ARRAY{{ $node[\"Webhook - Crear Cita\"].json.servicios }}::uuid[]))\nRETURNING *;",
+        "options": {}
+      },
+      "name": "Supabase - Servicios Cita",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT c.*, cl.nombre as cliente_nombre, cl.email as cliente_email,\n       e.nombre as barbero_nombre, e.email as barbero_email\nFROM citas c\nJOIN clientes cl ON c.cliente_id = cl.id\nJOIN empleados e ON c.barbero_id = e.id\nWHERE c.id = '{{ $node[\"Supabase - Insertar Cita\"].json.id }}';",
+        "options": {}
+      },
+      "name": "Obtener Datos Completos",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT access_token, refresh_token FROM google_tokens\nWHERE user_id = '{{ $json.barbero_id }}' AND provider = 'google'\nLIMIT 1;",
+        "options": {}
+      },
+      "name": "Obtener Token Google",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "operation": "create",
+        "start": "={{ $node[\"Obtener Datos Completos\"].json.fecha_hora }}",
+        "end": "={{ new Date(new Date($node[\"Obtener Datos Completos\"].json.fecha_hora).getTime() + $node[\"Obtener Datos Completos\"].json.duracion * 60000).toISOString() }}",
+        "summary": "Cita - {{ $node[\"Obtener Datos Completos\"].json.cliente_nombre }}",
+        "description": "Cliente: {{ $node[\"Obtener Datos Completos\"].json.cliente_nombre }}\\nBarbero: {{ $node[\"Obtener Datos Completos\"].json.barbero_nombre }}\\nNotas: {{ $node[\"Obtener Datos Completos\"].json.notas }}",
+        "options": {}
+      },
+      "name": "Google Calendar - Crear Evento",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1,
+      "position": [1250, 300],
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "name": "Google Calendar"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { success: true, cita: $node[\"Obtener Datos Completos\"].json, google_event_id: $node[\"Google Calendar - Crear Evento\"].json.id } }}"
+      },
+      "name": "Respuesta Exitosa",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "PUT",
+        "path": "cita/actualizar",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook - Actualizar Cita",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 500],
+      "webhookId": "actualizar-cita"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE citas SET\n  cliente_id = COALESCE('{{ $json.cliente_id }}', cliente_id),\n  barbero_id = COALESCE('{{ $json.barbero_id }}', barbero_id),\n  fecha_hora = COALESCE('{{ $json.fecha_hora }}'::timestamptz, fecha_hora),\n  duracion = COALESCE({{ $json.duracion }}, duracion),\n  estado = COALESCE('{{ $json.estado }}', estado),\n  notas = COALESCE('{{ $json.notas }}', notas),\n  updated_at = NOW()\nWHERE id = '{{ $json.id }}'\nRETURNING *;"
+      },
+      "name": "Supabase - Actualizar Cita",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 500],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "DELETE",
+        "path": "cita/eliminar/:id",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook - Eliminar Cita",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 700],
+      "webhookId": "eliminar-cita"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM citas WHERE id = '{{ $parameter.id }}' RETURNING *;"
+      },
+      "name": "Supabase - Eliminar Cita",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 700],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "empleado/crear",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook - Crear Empleado",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 900],
+      "webhookId": "crear-empleado"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO empleados (nombre, telefono, email, rol, password_hash, porcentaje_comision, especialidad)\nVALUES ('{{ $json.nombre }}', '{{ $json.telefono }}', '{{ $json.email }}', '{{ $json.rol }}', '{{ $json.password_hash }}', {{ $json.porcentaje_comision }}, '{{ $json.especialidad }}')\nRETURNING *;"
+      },
+      "name": "Supabase - Insertar Empleado",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 900],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cliente/crear",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook - Crear Cliente",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 1100],
+      "webhookId": "crear-cliente"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO clientes (nombre, telefono, email, direccion, notas)\nVALUES ('{{ $json.nombre }}', '{{ $json.telefono }}', '{{ $json.email }}', '{{ $json.direccion }}', '{{ $json.notas }}')\nRETURNING *;"
+      },
+      "name": "Supabase - Insertar Cliente",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 1100],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "servicio/crear",
+        "responseMode": "responseNode"
+      },
+      "name": "Webhook - Crear Servicio",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 1300],
+      "webhookId": "crear-servicio"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO servicios (nombre, descripcion, precio, duracion, categoria)\nVALUES ('{{ $json.nombre }}', '{{ $json.descripcion }}', {{ $json.precio }}, {{ $json.duracion }}, '{{ $json.categoria }}')\nRETURNING *;"
+      },
+      "name": "Supabase - Insertar Servicio",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 1300],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - Crear Cita": {
+      "main": [[{"node": "Supabase - Insertar Cita", "type": "main", "index": 0}]]
+    },
+    "Supabase - Insertar Cita": {
+      "main": [[{"node": "Supabase - Servicios Cita", "type": "main", "index": 0}]]
+    },
+    "Supabase - Servicios Cita": {
+      "main": [[{"node": "Obtener Datos Completos", "type": "main", "index": 0}]]
+    },
+    "Obtener Datos Completos": {
+      "main": [[{"node": "Obtener Token Google", "type": "main", "index": 0}]]
+    },
+    "Obtener Token Google": {
+      "main": [[{"node": "Google Calendar - Crear Evento", "type": "main", "index": 0}]]
+    },
+    "Google Calendar - Crear Evento": {
+      "main": [[{"node": "Respuesta Exitosa", "type": "main", "index": 0}]]
+    },
+    "Webhook - Actualizar Cita": {
+      "main": [[{"node": "Supabase - Actualizar Cita", "type": "main", "index": 0}]]
+    },
+    "Webhook - Eliminar Cita": {
+      "main": [[{"node": "Supabase - Eliminar Cita", "type": "main", "index": 0}]]
+    },
+    "Webhook - Crear Empleado": {
+      "main": [[{"node": "Supabase - Insertar Empleado", "type": "main", "index": 0}]]
+    },
+    "Webhook - Crear Cliente": {
+      "main": [[{"node": "Supabase - Insertar Cliente", "type": "main", "index": 0}]]
+    },
+    "Webhook - Crear Servicio": {
+      "main": [[{"node": "Supabase - Insertar Servicio", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "1"
+}

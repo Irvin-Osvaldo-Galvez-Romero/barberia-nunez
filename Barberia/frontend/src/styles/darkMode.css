@@ -1,0 +1,504 @@
+/* Dark Mode Styles for Pages */
+
+html[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3a3a3a;
+  --text-primary: #f5f5f5;
+  --text-secondary: #d0d0d0;
+  --border-color: #4a4a4a;
+  --shadow-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dashboard Dark Mode */
+html[data-theme="dark"] .dashboard-container {
+  background: #0f0f0f;
+}
+
+html[data-theme="dark"] .dashboard-header {
+  border-bottom-color: #4a4a4a;
+  background: transparent;
+}
+
+html[data-theme="dark"] .dashboard-title,
+html[data-theme="dark"] .dashboard-subtitle {
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .dashboard-date {
+  background: #2d2d2d;
+  color: #f5f5f5;
+  border-color: #4a4a4a;
+}
+
+html[data-theme="dark"] .stat-card {
+  background: #2d2d2d;
+  border-color: #4a4a4a;
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .stat-card::before {
+  background: #4a4a4a;
+}
+
+html[data-theme="dark"] .stat-value {
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .stat-label {
+  color: #d0d0d0;
+}
+
+/* Citas Calendar Dark Mode */
+html[data-theme="dark"] .main-content {
+  background: #2d2d2d;
+  border-top-color: #4a4a4a;
+  border-color: #4a4a4a;
+}
+
+html[data-theme="dark"] .calendar-header {
+  border-bottom-color: #4a4a4a;
+  background: #1a1a1a;
+}
+
+html[data-theme="dark"] .calendar-title {
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .btn-nav {
+  border-color: #4a4a4a;
+  background: #2d2d2d;
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .btn-nav:hover {
+  background: #3a3a3a;
+  border-color: #5a5a5a;
+}
+
+html[data-theme="dark"] .current-date {
+  background: #3a3a3a;
+  color: #f5f5f5;
+  border-color: #4a4a4a;
+}
+
+html[data-theme="dark"] .calendar-grid {
+  border-color: #4a4a4a;
+  background: #1a1a1a;
+}
+
+html[data-theme="dark"] .time-column {
+  border-right-color: #4a4a4a;
+  background: #2d2d2d;
+}
+
+html[data-theme="dark"] .time-header {
+  background: #1a1a1a;
+  border-bottom-color: #4a4a4a;
+  border-right-color: #4a4a4a;
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .time-slot {
+  border-bottom-color: #4a4a4a;
+  background: #2d2d2d;
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .day-header {
+  background: #2d2d2d;
+  border-bottom-color: #4a4a4a;
+  border-right-color: #4a4a4a;
+  border-left-color: #4a4a4a;
+}
+
+html[data-theme="dark"] .day-name,
+html[data-theme="dark"] .day-number {
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .day-number.today {
+  background: #f5f5f5;
+  color: #1a1a1a;
+}
+
+html[data-theme="dark"] .appointment {
+  background: #3a6ea8;
+  border-color: #2a5a98;
+}
+
+/* Clientes Dark Mode */
+html[data-theme="dark"] .clientes-container {
+  background: #0f0f0f;
+}
+
+html[data-theme="dark"] .clientes-header {
+  border-bottom-color: #4a4a4a;
+}
+
+html[data-theme="dark"] .clientes-title {
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .search-bar {
+  background: #2d2d2d;
+  border-color: #4a4a4a;
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .search-bar::placeholder {
+  color: #999;
+}
+
+html[data-theme="dark"] .clients-list {
+  background: #1a1a1a;
+}
+
+html[data-theme="dark"] .client-card {
+  background: #2d2d2d;
+  border-color: #4a4a4a;
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .client-card:hover {
+  background: #3a3a3a;
+}
+
+/* Form inputs in Dark Mode */
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background: #2d2d2d;
+  color: #f5f5f5;
+  border-color: #4a4a4a;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #999;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] textarea:focus,
+html[data-theme="dark"] select:focus {
+  border-color: #5a5a5a;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(90, 90, 90, 0.1);
+}
+
+/* Buttons in Dark Mode */
+html[data-theme="dark"] .btn-primary {
+  background: #3a6ea8;
+  color: #f5f5f5;
+  border-color: #2a5a98;
+}
+
+html[data-theme="dark"] .btn-primary:hover {
+  background: #4a7eb8;
+}
+
+html[data-theme="dark"] .btn-secondary {
+  background: #3a3a3a;
+  color: #f5f5f5;
+  border-color: #4a4a4a;
+}
+
+html[data-theme="dark"] .btn-secondary:hover {
+  background: #4a4a4a;
+}
+
+/* Modal in Dark Mode */
+html[data-theme="dark"] .modal-content {
+  background: #1a1a1a;
+  color: #f5f5f5;
+}
+
+html[data-theme="dark"] .modal-header {
+  border-bottom-color: #4a4a4a;
+  background: #0f0f0f;
+}
+
+html[data-theme="dark"] .modal-body {
+  background: #1a1a1a;
+}
+
+html[data-theme="dark"] .modal-footer {
+  border-top-color: #4a4a4a;
+  background: #0f0f0f;
+}
+
+html[data-theme="dark"] .modal-title {
+  color: #f8fafc;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+html[data-theme="dark"] .modal-close {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .modal-content .form-label {
+  color: #60a5fa !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 4px rgba(96, 165, 250, 0.4), 0 0 8px rgba(96, 165, 250, 0.2) !important;
+  font-size: 15px !important;
+  letter-spacing: 0.3px !important;
+}
+
+html[data-theme="dark"] .modal-content .form-input,
+html[data-theme="dark"] .modal-content .form-textarea,
+html[data-theme="dark"] .modal-content select {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .modal-content .form-input:focus,
+html[data-theme="dark"] .modal-content .form-textarea:focus,
+html[data-theme="dark"] .modal-content select:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+  outline: none;
+}
+
+/* Checkbox labels visibility in Dark Mode */
+html[data-theme="dark"] input[type="checkbox"] + label,
+html[data-theme="dark"] .checkbox-label,
+html[data-theme="dark"] label[for] {
+  color: #60a5fa !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 4px rgba(96, 165, 250, 0.4), 0 0 8px rgba(96, 165, 250, 0.2) !important;
+  font-size: 15px !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* Ensure form labels are readable in Dark Mode (global) */
+html[data-theme="dark"] .form-label {
+  color: #60a5fa !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 4px rgba(96, 165, 250, 0.4), 0 0 8px rgba(96, 165, 250, 0.2) !important;
+  font-size: 15px !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* ========== SEARCH INPUTS & FILTERS - DARK MODE ========== */
+/* Todos los buscadores deben tener texto visible */
+html[data-theme="dark"] .search-input,
+html[data-theme="dark"] .filter-input,
+html[data-theme="dark"] .search-bar input[type="text"],
+html[data-theme="dark"] .search-client-input,
+html[data-theme="dark"] input[type="search"],
+html[data-theme="dark"] input[type="text"] {
+  color: #000000 !important;
+  background: #ffffff !important;
+  border-color: #334155 !important;
+  font-weight: 600 !important;
+  cursor: text !important;
+  z-index: 10 !important;
+  position: relative !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+html[data-theme="dark"] .search-input::placeholder,
+html[data-theme="dark"] .filter-input::placeholder,
+html[data-theme="dark"] .search-bar input[type="text"]::placeholder,
+html[data-theme="dark"] .search-client-input::placeholder,
+html[data-theme="dark"] input[type="search"]::placeholder,
+html[data-theme="dark"] input[type="text"]::placeholder {
+  color: #666666 !important;
+  font-weight: 500;
+  opacity: 1 !important;
+}
+
+html[data-theme="dark"] .search-input:focus,
+html[data-theme="dark"] .filter-input:focus,
+html[data-theme="dark"] .search-bar input[type="text"]:focus,
+html[data-theme="dark"] .search-client-input:focus,
+html[data-theme="dark"] input[type="search"]:focus,
+html[data-theme="dark"] input[type="text"]:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1) !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  z-index: 11 !important;
+}
+
+/* ========== CHECKBOXES - DARK MODE ========== */
+/* Todos los checkboxes deben ser visibles */
+html[data-theme="dark"] input[type="checkbox"] {
+  accent-color: #38bdf8 !important;
+  width: 20px !important;
+  height: 20px !important;
+  cursor: pointer !important;
+}
+
+html[data-theme="dark"] input[type="checkbox"]:checked {
+  accent-color: #38bdf8 !important;
+  background-color: #38bdf8 !important;
+  border-color: #38bdf8 !important;
+}
+
+/* ========== CHECKBOX LABELS - DARK MODE ========== */
+html[data-theme="dark"] .form-checkbox-label,
+html[data-theme="dark"] .checkbox-label,
+html[data-theme="dark"] label[for],
+html[data-theme="dark"] .toggle-label,
+html[data-theme="dark"] .service-checkbox-label span,
+html[data-theme="dark"] .config-notificaciones .form-checkbox-label {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6) !important;
+  font-size: 14px !important;
+}
+
+html[data-theme="dark"] input[type="checkbox"] + label,
+html[data-theme="dark"] input[type="checkbox"] + span {
+  color: #f8fafc !important;
+  font-weight: 700 !important;
+}
+
+/* ========== FORM INPUTS GENERALES - DARK MODE ========== */
+html[data-theme="dark"] input[type="email"],
+html[data-theme="dark"] input[type="password"],
+html[data-theme="dark"] input[type="number"],
+html[data-theme="dark"] input[type="tel"],
+html[data-theme="dark"] input[type="time"],
+html[data-theme="dark"] input[type="date"],
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: #334155 !important;
+  font-weight: 600 !important;
+  cursor: text !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  padding: 10px 12px !important;
+}
+
+html[data-theme="dark"] input[type="email"]::placeholder,
+html[data-theme="dark"] input[type="password"]::placeholder,
+html[data-theme="dark"] input[type="number"]::placeholder,
+html[data-theme="dark"] input[type="tel"]::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="dark"] input[type="email"]:focus,
+html[data-theme="dark"] input[type="password"]:focus,
+html[data-theme="dark"] input[type="number"]:focus,
+html[data-theme="dark"] input[type="tel"]:focus,
+html[data-theme="dark"] input[type="time"]:focus,
+html[data-theme="dark"] input[type="date"]:focus,
+html[data-theme="dark"] textarea:focus,
+html[data-theme="dark"] select:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
+  background: #1e293b !important;
+  color: #ffffff !important;
+  outline: none !important;
+}
+
+/* ========== SELECT OPTIONS - DARK MODE ========== */
+html[data-theme="dark"] select option {
+  background: #1e293b;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 12px;
+}
+
+html[data-theme="dark"] select option:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] select option:checked {
+  background: #38bdf8;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* Specific checkbox label variants across views */
+html[data-theme="dark"] .toggle-label {
+  color: #0a4f95 !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="dark"] .service-checkbox-label span {
+  color: #094e93 !important;
+  font-weight: 700 !important;
+}
+
+/* ========== MODAL FORM INPUTS - DARK MODE ========== */
+/* Ensure modals also have visible form inputs */
+html[data-theme="dark"] .modal-content input[type="email"],
+html[data-theme="dark"] .modal-content input[type="password"],
+html[data-theme="dark"] .modal-content input[type="number"],
+html[data-theme="dark"] .modal-content input[type="tel"],
+html[data-theme="dark"] .modal-content input[type="text"],
+html[data-theme="dark"] .modal-content input[type="search"],
+html[data-theme="dark"] .modal-content input[type="date"],
+html[data-theme="dark"] .modal-content input[type="time"],
+html[data-theme="dark"] .modal-content textarea,
+html[data-theme="dark"] .modal-content select {
+  background: #1e293b !important;
+  color: #ffffff !important;
+  border-color: #334155 !important;
+  font-weight: 600 !important;
+}
+
+html[data-theme="dark"] .modal-content input::placeholder,
+html[data-theme="dark"] .modal-content textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* ========== MODAL CHECKBOX & LABELS - DARK MODE ========== */
+html[data-theme="dark"] .modal-content input[type="checkbox"] {
+  accent-color: #38bdf8 !important;
+}
+
+html[data-theme="dark"] .modal-content label,
+html[data-theme="dark"] .modal-content .checkbox-label,
+html[data-theme="dark"] .modal-content .form-checkbox-label {
+  color: #60a5fa !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 4px rgba(96, 165, 250, 0.4), 0 0 8px rgba(96, 165, 250, 0.2) !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* Servicios - Override para "Servicio activo" - texto azul estilizado en dark mode */
+html[data-theme="dark"] .servicios-container .modal-content .form-checkbox-label {
+  color: #60a5fa !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 4px rgba(96, 165, 250, 0.4), 0 0 8px rgba(96, 165, 250, 0.2) !important;
+  letter-spacing: 0.3px !important;
+}
+
+html[data-theme="dark"] .servicios-container .modal-content .form-checkbox-label span {
+  color: #60a5fa !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 4px rgba(96, 165, 250, 0.4), 0 0 8px rgba(96, 165, 250, 0.2) !important;
+  display: inline-block !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* Scrollbar in Dark Mode */
+html[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #5a5a5a;
+}

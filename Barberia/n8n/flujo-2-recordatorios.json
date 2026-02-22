@@ -1,0 +1,142 @@
+{
+  "name": "Barbería - Recordatorios Automáticos",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "name": "Cron - Cada 15 minutos",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Citas en 24 horas (aún no notificadas)\nSELECT c.*, \n       cl.nombre as cliente_nombre, \n       cl.email as cliente_email, \n       cl.telefono as cliente_telefono,\n       e.nombre as barbero_nombre,\n       string_agg(s.nombre, ', ') as servicios\nFROM citas c\nJOIN clientes cl ON c.cliente_id = cl.id\nJOIN empleados e ON c.barbero_id = e.id\nLEFT JOIN servicios_citas sc ON c.id = sc.cita_id\nLEFT JOIN servicios s ON sc.servicio_id = s.id\nWHERE c.estado = 'PENDIENTE'\n  AND c.fecha_hora BETWEEN NOW() + INTERVAL '23 hours 45 minutes' \n                       AND NOW() + INTERVAL '24 hours 15 minutes'\n  AND NOT EXISTS (\n    SELECT 1 FROM recordatorios_enviados \n    WHERE cita_id = c.id AND tipo = '24h'\n  )\nGROUP BY c.id, cl.nombre, cl.email, cl.telefono, e.nombre;",
+        "options": {}
+      },
+      "name": "Buscar Citas 24h",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 200],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Citas en 1 hora (aún no notificadas)\nSELECT c.*, \n       cl.nombre as cliente_nombre, \n       cl.email as cliente_email, \n       cl.telefono as cliente_telefono,\n       e.nombre as barbero_nombre,\n       string_agg(s.nombre, ', ') as servicios\nFROM citas c\nJOIN clientes cl ON c.cliente_id = cl.id\nJOIN empleados e ON c.barbero_id = e.id\nLEFT JOIN servicios_citas sc ON c.id = sc.cita_id\nLEFT JOIN servicios s ON sc.servicio_id = s.id\nWHERE c.estado = 'PENDIENTE'\n  AND c.fecha_hora BETWEEN NOW() + INTERVAL '45 minutes' \n                       AND NOW() + INTERVAL '1 hour 15 minutes'\n  AND NOT EXISTS (\n    SELECT 1 FROM recordatorios_enviados \n    WHERE cita_id = c.id AND tipo = '1h'\n  )\nGROUP BY c.id, cl.nombre, cl.email, cl.telefono, e.nombre;",
+        "options": {}
+      },
+      "name": "Buscar Citas 1h",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 400],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.cliente_email }}",
+        "subject": "📅 Recordatorio: Tu cita en la barbería mañana",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }\n    .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }\n    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }\n    .info { background: #f9f9f9; padding: 15px; border-left: 4px solid #667eea; margin: 15px 0; }\n    .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h2>💈 Recordatorio de Cita</h2>\n    </div>\n    <p>Hola <strong>{{ $json.cliente_nombre }}</strong>,</p>\n    <p>Te recordamos que tienes una cita programada:</p>\n    <div class=\"info\">\n      <p><strong>📅 Fecha:</strong> {{ new Date($json.fecha_hora).toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</p>\n      <p><strong>🕐 Hora:</strong> {{ new Date($json.fecha_hora).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) }}</p>\n      <p><strong>💈 Barbero:</strong> {{ $json.barbero_nombre }}</p>\n      <p><strong>✂️ Servicios:</strong> {{ $json.servicios }}</p>\n      <p><strong>⏱️ Duración:</strong> {{ $json.duracion }} minutos</p>\n    </div>\n    <p>¡Te esperamos!</p>\n    <div class=\"footer\">\n      <p>Sistema de Barbería © 2026</p>\n      <p>Este es un correo automático, no respondas directamente</p>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Gmail - Enviar Recordatorio 24h",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [650, 200],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.cliente_email }}",
+        "subject": "⚠️ ¡Tu cita es en 1 hora!",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }\n    .container { max-width: 500px; margin: 0 auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }\n    .header { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; }\n    .urgent { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 15px 0; }\n    .info { background: #f9f9f9; padding: 15px; border-left: 4px solid #667eea; margin: 15px 0; }\n    .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h2>⚠️ ¡RECORDATORIO URGENTE!</h2>\n    </div>\n    <div class=\"urgent\">\n      <p style=\"margin: 0; font-size: 16px; font-weight: bold;\">Tu cita es en aproximadamente 1 hora</p>\n    </div>\n    <p>Hola <strong>{{ $json.cliente_nombre }}</strong>,</p>\n    <p>Te recordamos que tienes una cita MUY PRONTO:</p>\n    <div class=\"info\">\n      <p><strong>🕐 Hora:</strong> {{ new Date($json.fecha_hora).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) }}</p>\n      <p><strong>💈 Barbero:</strong> {{ $json.barbero_nombre }}</p>\n      <p><strong>✂️ Servicios:</strong> {{ $json.servicios }}</p>\n    </div>\n    <p style=\"color: #666;\">Si no puedes asistir, por favor avísanos lo antes posible.</p>\n    <div class=\"footer\">\n      <p>Sistema de Barbería © 2026</p>\n    </div>\n  </div>\n</body>\n</html>"
+      },
+      "name": "Gmail - Enviar Recordatorio 1h",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [650, 400],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO recordatorios_enviados (cita_id, tipo, enviado_at)\nVALUES ('{{ $json.id }}', '24h', NOW());"
+      },
+      "name": "Marcar como Enviado 24h",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 200],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO recordatorios_enviados (cita_id, tipo, enviado_at)\nVALUES ('{{ $json.id }}', '1h', NOW());"
+      },
+      "name": "Marcar como Enviado 1h",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 400],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron - Cada 15 minutos": {
+      "main": [
+        [
+          {"node": "Buscar Citas 24h", "type": "main", "index": 0},
+          {"node": "Buscar Citas 1h", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Buscar Citas 24h": {
+      "main": [[{"node": "Gmail - Enviar Recordatorio 24h", "type": "main", "index": 0}]]
+    },
+    "Buscar Citas 1h": {
+      "main": [[{"node": "Gmail - Enviar Recordatorio 1h", "type": "main", "index": 0}]]
+    },
+    "Gmail - Enviar Recordatorio 24h": {
+      "main": [[{"node": "Marcar como Enviado 24h", "type": "main", "index": 0}]]
+    },
+    "Gmail - Enviar Recordatorio 1h": {
+      "main": [[{"node": "Marcar como Enviado 1h", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "2"
+}

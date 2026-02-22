@@ -1,0 +1,251 @@
+{
+  "name": "Barbería - Reportes Automáticos",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hour",
+              "hourInterval": 21
+            }
+          ]
+        }
+      },
+      "name": "Cron - Diario 9:00 PM",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weekday",
+              "weekdayInterval": 1,
+              "hour": 8
+            }
+          ]
+        }
+      },
+      "name": "Cron - Semanal Lunes 8:00 AM",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 600]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Reporte diario\nSELECT \n  COUNT(*) as total_citas,\n  COUNT(CASE WHEN estado = 'COMPLETADA' THEN 1 END) as completadas,\n  COUNT(CASE WHEN estado = 'CANCELADA' THEN 1 END) as canceladas,\n  COUNT(CASE WHEN estado = 'NO_ASISTIO' THEN 1 END) as no_asistio,\n  COALESCE(SUM(\n    (SELECT SUM(precio) FROM servicios_citas sc WHERE sc.cita_id = citas.id)\n  ), 0) as ingresos_total\nFROM citas\nWHERE DATE(fecha_hora) = CURRENT_DATE;",
+        "options": {}
+      },
+      "name": "Estadísticas del Día",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 200],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Top servicios del día\nSELECT s.nombre, COUNT(*) as cantidad\nFROM servicios_citas sc\nJOIN servicios s ON sc.servicio_id = s.id\nJOIN citas c ON sc.cita_id = c.id\nWHERE DATE(c.fecha_hora) = CURRENT_DATE\nGROUP BY s.nombre\nORDER BY cantidad DESC\nLIMIT 5;",
+        "options": {}
+      },
+      "name": "Top Servicios Día",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 300],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Top barberos del día\nSELECT e.nombre, COUNT(*) as citas_atendidas\nFROM citas c\nJOIN empleados e ON c.barbero_id = e.id\nWHERE DATE(c.fecha_hora) = CURRENT_DATE\n  AND c.estado = 'COMPLETADA'\nGROUP BY e.nombre\nORDER BY citas_atendidas DESC;",
+        "options": {}
+      },
+      "name": "Top Barberos Día",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 400],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construir reporte diario\nconst stats = $input.first().json;\nconst servicios = $input.all()[1].json;\nconst barberos = $input.all()[2].json;\n\nconst fecha = new Date().toLocaleDateString('es-MX', {\n  weekday: 'long',\n  year: 'numeric',\n  month: 'long',\n  day: 'numeric'\n});\n\nlet topServicios = '';\nservicios.forEach((s, i) => {\n  topServicios += `${i+1}. ${s.nombre} (${s.cantidad} veces)\\n`;\n});\n\nlet topBarberos = '';\nbarberos.forEach((b, i) => {\n  topBarberos += `${i+1}. ${b.nombre} - ${b.citas_atendidas} citas\\n`;\n});\n\nconst promedio = stats.total_citas > 0 \n  ? (stats.ingresos_total / stats.total_citas).toFixed(2)\n  : 0;\n\nconst reporte = `\n📊 REPORTE DIARIO\n${fecha}\n\n═══════════════════════════════\n\n📈 ESTADÍSTICAS GENERALES\n\nCitas totales: ${stats.total_citas}\n✅ Completadas: ${stats.completadas}\n❌ Canceladas: ${stats.canceladas}\n⏰ No asistieron: ${stats.no_asistio}\n\n💰 INGRESOS\n\nTotal del día: $${stats.ingresos_total.toFixed(2)} MXN\nPromedio por cita: $${promedio} MXN\n\n═══════════════════════════════\n\n✂️ TOP SERVICIOS\n\n${topServicios || 'No hay datos'}\n\n💈 TOP BARBEROS\n\n${topBarberos || 'No hay datos'}\n\n═══════════════════════════════\n\nSistema de Barbería © 2026\n`;\n\nreturn { json: { reporte } };"
+      },
+      "name": "Generar Reporte Diario",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT email FROM empleados WHERE rol = 'ADMINISTRADOR' AND activo = true;"
+      },
+      "name": "Obtener Emails Admin",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "📊 Reporte Diario de Barbería - {{ new Date().toLocaleDateString('es-MX') }}",
+        "emailType": "text",
+        "message": "={{ $node['Generar Reporte Diario'].json.reporte }}"
+      },
+      "name": "Gmail - Enviar Reporte Diario",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Reporte semanal (última semana)\nSELECT \n  COUNT(*) as total_citas,\n  COUNT(CASE WHEN estado = 'COMPLETADA' THEN 1 END) as completadas,\n  COALESCE(SUM(\n    (SELECT SUM(precio) FROM servicios_citas sc WHERE sc.cita_id = citas.id)\n  ), 0) as ingresos_total\nFROM citas\nWHERE fecha_hora >= DATE_TRUNC('week', CURRENT_DATE - INTERVAL '7 days')\n  AND fecha_hora < DATE_TRUNC('week', CURRENT_DATE);",
+        "options": {}
+      },
+      "name": "Estadísticas Semana",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 600],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Top 5 clientes de la semana\nSELECT cl.nombre, COUNT(*) as visitas,\n       COALESCE(SUM(\n         (SELECT SUM(precio) FROM servicios_citas sc WHERE sc.cita_id = c.id)\n       ), 0) as gastado\nFROM citas c\nJOIN clientes cl ON c.cliente_id = cl.id\nWHERE c.fecha_hora >= DATE_TRUNC('week', CURRENT_DATE - INTERVAL '7 days')\n  AND c.fecha_hora < DATE_TRUNC('week', CURRENT_DATE)\n  AND c.estado = 'COMPLETADA'\nGROUP BY cl.nombre\nORDER BY visitas DESC, gastado DESC\nLIMIT 5;",
+        "options": {}
+      },
+      "name": "Top Clientes Semana",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 700],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Top servicios de la semana\nSELECT s.nombre, COUNT(*) as cantidad,\n       SUM(sc.precio) as ingresos\nFROM servicios_citas sc\nJOIN servicios s ON sc.servicio_id = s.id\nJOIN citas c ON sc.cita_id = c.id\nWHERE c.fecha_hora >= DATE_TRUNC('week', CURRENT_DATE - INTERVAL '7 days')\n  AND c.fecha_hora < DATE_TRUNC('week', CURRENT_DATE)\nGROUP BY s.nombre\nORDER BY cantidad DESC\nLIMIT 5;",
+        "options": {}
+      },
+      "name": "Top Servicios Semana",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [450, 800],
+      "credentials": {
+        "postgres": {
+          "name": "Supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Construir reporte semanal\nconst stats = $input.first().json;\nconst clientes = $input.all()[1].json;\nconst servicios = $input.all()[2].json;\n\nconst semana = `Semana del ${new Date(Date.now() - 7*24*60*60*1000).toLocaleDateString('es-MX')} al ${new Date().toLocaleDateString('es-MX')}`;\n\nlet topClientes = '';\nclientes.forEach((c, i) => {\n  topClientes += `${i+1}. ${c.nombre} - ${c.visitas} visitas ($${c.gastado.toFixed(2)})\\n`;\n});\n\nlet topServicios = '';\nservicios.forEach((s, i) => {\n  topServicios += `${i+1}. ${s.nombre} (${s.cantidad} veces - $${s.ingresos.toFixed(2)})\\n`;\n});\n\nconst promedio = stats.total_citas > 0 \n  ? (stats.ingresos_total / stats.total_citas).toFixed(2)\n  : 0;\n\nconst reporte = `\n📈 REPORTE SEMANAL\n${semana}\n\n═══════════════════════════════\n\n📊 RESUMEN GENERAL\n\nCitas totales: ${stats.total_citas}\n✅ Completadas: ${stats.completadas}\nTasa de completación: ${stats.total_citas > 0 ? ((stats.completadas/stats.total_citas)*100).toFixed(1) : 0}%\n\n💰 INGRESOS\n\nTotal de la semana: $${stats.ingresos_total.toFixed(2)} MXN\nPromedio por cita: $${promedio} MXN\nPromedio diario: $${(stats.ingresos_total / 7).toFixed(2)} MXN\n\n═══════════════════════════════\n\n👥 TOP 5 CLIENTES\n\n${topClientes || 'No hay datos'}\n\n✂️ TOP 5 SERVICIOS\n\n${topServicios || 'No hay datos'}\n\n═══════════════════════════════\n\nSistema de Barbería © 2026\n`;\n\nreturn { json: { reporte } };"
+      },
+      "name": "Generar Reporte Semanal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 700]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "📈 Reporte Semanal de Barbería",
+        "emailType": "text",
+        "message": "={{ $node['Generar Reporte Semanal'].json.reporte }}"
+      },
+      "name": "Gmail - Enviar Reporte Semanal",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [1050, 700],
+      "credentials": {
+        "gmailOAuth2": {
+          "name": "Gmail"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cron - Diario 9:00 PM": {
+      "main": [
+        [
+          {"node": "Estadísticas del Día", "type": "main", "index": 0},
+          {"node": "Top Servicios Día", "type": "main", "index": 0},
+          {"node": "Top Barberos Día", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Estadísticas del Día": {
+      "main": [[{"node": "Generar Reporte Diario", "type": "main", "index": 0}]]
+    },
+    "Top Servicios Día": {
+      "main": [[{"node": "Generar Reporte Diario", "type": "main", "index": 0}]]
+    },
+    "Top Barberos Día": {
+      "main": [[{"node": "Generar Reporte Diario", "type": "main", "index": 0}]]
+    },
+    "Generar Reporte Diario": {
+      "main": [[{"node": "Obtener Emails Admin", "type": "main", "index": 0}]]
+    },
+    "Obtener Emails Admin": {
+      "main": [[{"node": "Gmail - Enviar Reporte Diario", "type": "main", "index": 0}]]
+    },
+    "Cron - Semanal Lunes 8:00 AM": {
+      "main": [
+        [
+          {"node": "Estadísticas Semana", "type": "main", "index": 0},
+          {"node": "Top Clientes Semana", "type": "main", "index": 0},
+          {"node": "Top Servicios Semana", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Estadísticas Semana": {
+      "main": [[{"node": "Generar Reporte Semanal", "type": "main", "index": 0}]]
+    },
+    "Top Clientes Semana": {
+      "main": [[{"node": "Generar Reporte Semanal", "type": "main", "index": 0}]]
+    },
+    "Top Servicios Semana": {
+      "main": [[{"node": "Generar Reporte Semanal", "type": "main", "index": 0}]]
+    },
+    "Generar Reporte Semanal": {
+      "main": [[{"node": "Obtener Emails Admin", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": "3"
+}

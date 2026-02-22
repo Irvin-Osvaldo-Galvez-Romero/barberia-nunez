@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 5: Citas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f1f5f9;
+            padding: 0;
+        }
+        .top-bar {
+            background: #1e293b;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .menu-container {
+            position: relative;
+        }
+        .menu-button {
+            background: #334155;
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+        .menu-button:hover {
+            background: #475569;
+        }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 8px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .menu-container:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .dropdown-menu a {
+            display: block;
+            padding: 12px 16px;
+            color: #1e293b;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .dropdown-menu a:last-child {
+            border-bottom: none;
+        }
+        .dropdown-menu a:hover {
+            background: #f1f5f9;
+        }
+        .dropdown-menu a.active {
+            background: #1e293b;
+            color: white;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: #475569;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px 20px;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+        }
+        .main-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .calendar-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .date-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-nav {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .current-date {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            overflow-x: auto;
+        }
+        .time-column {
+            border-right: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .time-slot {
+            height: 80px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .days-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .day-header {
+            height: 60px;
+            border-bottom: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+        }
+        .day-name {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .day-number {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1e293b;
+            margin-top: 4px;
+        }
+        .day-number.today {
+            width: 32px;
+            height: 32px;
+            background: #6366f1;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .day-column {
+            border-right: 1px solid #e2e8f0;
+        }
+        .day-column:last-child {
+            border-right: none;
+        }
+        .hour-slot {
+            height: 80px;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+        }
+        .hour-slot.has-multiple {
+            background: #f8fafc;
+        }
+        .appointment {
+            position: absolute;
+            padding: 6px;
+            border-radius: 6px;
+            border-left: 3px solid;
+            font-size: 11px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .appointment.pending {
+            background: #fef3c7;
+            border-color: #d97706;
+            color: #78350f;
+        }
+        .appointment.confirmed {
+            background: #e0e7ff;
+            border-color: #475569;
+            color: #1e293b;
+        }
+        .appointment.completed {
+            background: #d1fae5;
+            border-color: #059669;
+            color: #064e3b;
+        }
+        .appointment-name {
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 11px;
+        }
+        .appointment-service {
+            font-size: 10px;
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .sidebar-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn-new {
+            width: 100%;
+            padding: 14px;
+            background: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(30, 41, 59, 0.2);
+            transition: all 0.3s;
+        }
+        .btn-new:hover {
+            background: #334155;
+        }
+        .btn-stats {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #475569;
+        }
+        .sidebar-card {
+            border: 1px solid #e2e8f0;
+        }
+        .mini-calendar {
+            text-align: center;
+        }
+        .mini-calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .mini-calendar-title {
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .mini-calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .mini-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .mini-day.other-month {
+            color: #cbd5e1;
+        }
+        .mini-day.today {
+            background: #1e293b;
+            color: white;
+            font-weight: bold;
+        }
+        .mini-day.selected {
+            background: #f1f5f9;
+            color: #1e293b;
+            font-weight: bold;
+            border: 2px solid #475569;
+        }
+        .staff-list {
+            margin-top: 16px;
+        }
+        .staff-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .staff-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        .staff-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #059669;
+            font-weight: 600;
+        }
+        .staff-status.break {
+            color: #d97706;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+        .modal-close:hover {
+            background: #f1f5f9;
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .search-client-wrapper {
+            position: relative;
+        }
+        .search-client-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8fafc;
+        }
+        .search-client-input:focus {
+            outline: none;
+            border-color: #475569;
+            background: white;
+        }
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 18px;
+        }
+        .client-results {
+            margin-top: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+        .client-results.show {
+            display: block;
+        }
+        .client-result-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .client-result-item:hover {
+            background: #f8fafc;
+        }
+        .client-result-item:last-child {
+            border-bottom: none;
+        }
+        .client-result-info {
+            flex: 1;
+        }
+        .client-result-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        .client-result-contact {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .client-result-visits {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 600;
+        }
+        .btn-create-client {
+            width: 100%;
+            padding: 12px;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            color: #475569;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-create-client:hover {
+            background: #f1f5f9;
+            border-color: #475569;
+        }
+        .selected-client {
+            padding: 12px;
+            background: #e0e7ff;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: none;
+        }
+        .selected-client.show {
+            display: block;
+        }
+        .selected-client-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .selected-client-details {
+            flex: 1;
+        }
+        .selected-client-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        .selected-client-contact {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 2px;
+        }
+        .btn-remove-client {
+            background: transparent;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .btn-remove-client:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8fafc;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #475569;
+            background: white;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .auto-count-notice {
+            padding: 12px;
+            background: #dbeafe;
+            border-left: 3px solid #1e40af;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #1e40af;
+        }
+        .modal-footer {
+            padding: 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        .btn-cancel {
+            padding: 12px 24px;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            color: #475569;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-cancel:hover {
+            background: #f8fafc;
+        }
+        .btn-save {
+            padding: 12px 24px;
+            background: #1e293b;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-save:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="menu-container">
+            <button class="menu-button">
+                ☰ Menú
+            </button>
+            <div class="dropdown-menu">
+                <a href="#">👥 Clientes</a>
+                <a href="#">✂️ Servicios</a>
+                <a href="#">👨‍💼 Empleados</a>
+                <a href="#" class="active">📅 Citas</a>
+                <a href="#">📊 Dashboard</a>
+                <a href="#">⚙️ Configuración</a>
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="avatar">AD</div>
+            <span>Admin</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="calendar-header">
+                <h1>Daily Calendar</h1>
+                <div class="date-controls">
+                    <button class="btn-nav">◀</button>
+                    <div class="current-date">Lunes, 15 de Enero</div>
+                    <button class="btn-nav">▶</button>
+                </div>
+            </div>
+            <div class="calendar-grid">
+                <div class="time-column">
+                    <div class="time-slot" style="height: 60px;"></div>
+                    <div class="time-slot">9 AM</div>
+                    <div class="time-slot">10 AM</div>
+                    <div class="time-slot">11 AM</div>
+                    <div class="time-slot">12 PM</div>
+                    <div class="time-slot">1 PM</div>
+                    <div class="time-slot">2 PM</div>
+                    <div class="time-slot">3 PM</div>
+                    <div class="time-slot">4 PM</div>
+                    <div class="time-slot">5 PM</div>
+                    <div class="time-slot">6 PM</div>
+                    <div class="time-slot">7 PM</div>
+                    <div class="time-slot">8 PM</div>
+                </div>
+                <div class="days-container">
+                    <div class="day-header">
+                        <div class="day-name">Lun</div>
+                        <div class="day-number today">15</div>
+                    </div>
+                    <div class="day-header">
+                        <div class="day-name">Mar</div>
+                        <div class="day-number">16</div>
+                    </div>
+                    <div class="day-header">
+                        <div class="day-name">Mié</div>
+                        <div class="day-number">17</div>
+                    </div>
+                    <div class="day-header">
+                        <div class="day-name">Jue</div>
+                        <div class="day-number">18</div>
+                    </div>
+                    <div class="day-header">
+                        <div class="day-name">Vie</div>
+                        <div class="day-number">19</div>
+                    </div>
+                    <div class="day-header">
+                        <div class="day-name">Sáb</div>
+                        <div class="day-number">20</div>
+                    </div>
+                    <div class="day-header">
+                        <div class="day-name">Dom</div>
+                        <div class="day-number">21</div>
+                    </div>
+                    <div class="day-column">
+                        <div class="hour-slot" style="height: 60px;"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot has-multiple">
+                            <div class="appointment confirmed" style="top: 0; height: 60px; left: 4px; right: 52%;">
+                                <div class="appointment-name">Juan Pérez</div>
+                                <div class="appointment-service">Corte - Carlos</div>
+                            </div>
+                            <div class="appointment confirmed" style="top: 0; height: 60px; left: 52%; right: 4px;">
+                                <div class="appointment-name">Luis Martínez</div>
+                                <div class="appointment-service">Barba - Ana</div>
+                            </div>
+                        </div>
+                        <div class="hour-slot has-multiple">
+                            <div class="appointment pending" style="top: 0; height: 60px; left: 4px; right: 52%;">
+                                <div class="appointment-name">Roberto Sánchez</div>
+                                <div class="appointment-service">Corte - Carlos</div>
+                            </div>
+                            <div class="appointment confirmed" style="top: 0; height: 60px; left: 52%; right: 4px;">
+                                <div class="appointment-name">Miguel Torres</div>
+                                <div class="appointment-service">Tinte - Ana</div>
+                            </div>
+                        </div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                    </div>
+                    <div class="day-column">
+                        <div class="hour-slot" style="height: 60px;"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot has-multiple">
+                            <div class="appointment pending" style="top: 0; height: 60px; left: 4px; right: 52%;">
+                                <div class="appointment-name">María García</div>
+                                <div class="appointment-service">Barba - Ana</div>
+                            </div>
+                            <div class="appointment confirmed" style="top: 0; height: 60px; left: 52%; right: 4px;">
+                                <div class="appointment-name">José Ramírez</div>
+                                <div class="appointment-service">Corte - Carlos</div>
+                            </div>
+                        </div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                    </div>
+                    <div class="day-column">
+                        <div class="hour-slot" style="height: 60px;"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot has-multiple">
+                            <div class="appointment completed" style="top: 0; height: 60px; left: 4px; right: 52%;">
+                                <div class="appointment-name">Pedro López</div>
+                                <div class="appointment-service">Tinte - Carlos</div>
+                            </div>
+                            <div class="appointment completed" style="top: 0; height: 60px; left: 52%; right: 4px;">
+                                <div class="appointment-name">Fernando Díaz</div>
+                                <div class="appointment-service">Corte - Ana</div>
+                            </div>
+                        </div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                    </div>
+                    <div class="day-column">
+                        <div class="hour-slot" style="height: 60px;"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot has-multiple">
+                            <div class="appointment confirmed" style="top: 0; height: 60px; left: 4px; right: 68%;">
+                                <div class="appointment-name">Sofía López</div>
+                                <div class="appointment-service">Corte - Carlos</div>
+                            </div>
+                            <div class="appointment confirmed" style="top: 0; height: 60px; left: 34%; right: 34%;">
+                                <div class="appointment-name">Diego Ruiz</div>
+                                <div class="appointment-service">Barba - Ana</div>
+                            </div>
+                            <div class="appointment pending" style="top: 0; height: 60px; left: 68%; right: 4px;">
+                                <div class="appointment-name">Laura Vega</div>
+                                <div class="appointment-service">Tinte - María</div>
+                            </div>
+                        </div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                    </div>
+                    <div class="day-column">
+                        <div class="hour-slot" style="height: 60px;"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                    </div>
+                    <div class="day-column">
+                        <div class="hour-slot" style="height: 60px;"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                    </div>
+                    <div class="day-column">
+                        <div class="hour-slot" style="height: 60px;"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                        <div class="hour-slot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-card">
+                <button class="btn-new" onclick="document.getElementById('modal-nueva-cita').classList.add('show')">+ Nueva Cita</button>
+                <button class="btn-stats" style="margin-top: 12px;">📊 Estadísticas</button>
+            </div>
+
+            <div class="sidebar-card">
+                <div class="mini-calendar">
+                    <div class="mini-calendar-header">
+                        <button class="btn-nav">◀</button>
+                        <div class="mini-calendar-title">Enero 2024</div>
+                        <button class="btn-nav">▶</button>
+                    </div>
+                    <div class="mini-calendar-grid">
+                        <div style="font-size: 10px; color: #64748b; font-weight: 600;">S</div>
+                        <div style="font-size: 10px; color: #64748b; font-weight: 600;">M</div>
+                        <div style="font-size: 10px; color: #64748b; font-weight: 600;">T</div>
+                        <div style="font-size: 10px; color: #64748b; font-weight: 600;">W</div>
+                        <div style="font-size: 10px; color: #64748b; font-weight: 600;">T</div>
+                        <div style="font-size: 10px; color: #64748b; font-weight: 600;">F</div>
+                        <div style="font-size: 10px; color: #64748b; font-weight: 600;">S</div>
+                        <div class="mini-day other-month">31</div>
+                        <div class="mini-day">1</div>
+                        <div class="mini-day">2</div>
+                        <div class="mini-day">3</div>
+                        <div class="mini-day">4</div>
+                        <div class="mini-day">5</div>
+                        <div class="mini-day">6</div>
+                        <div class="mini-day">7</div>
+                        <div class="mini-day">8</div>
+                        <div class="mini-day">9</div>
+                        <div class="mini-day">10</div>
+                        <div class="mini-day">11</div>
+                        <div class="mini-day">12</div>
+                        <div class="mini-day">13</div>
+                        <div class="mini-day">14</div>
+                        <div class="mini-day today">15</div>
+                        <div class="mini-day">16</div>
+                        <div class="mini-day">17</div>
+                        <div class="mini-day">18</div>
+                        <div class="mini-day">19</div>
+                        <div class="mini-day">20</div>
+                        <div class="mini-day">21</div>
+                        <div class="mini-day">22</div>
+                        <div class="mini-day">23</div>
+                        <div class="mini-day">24</div>
+                        <div class="mini-day">25</div>
+                        <div class="mini-day">26</div>
+                        <div class="mini-day">27</div>
+                        <div class="mini-day">28</div>
+                        <div class="mini-day">29</div>
+                        <div class="mini-day">30</div>
+                        <div class="mini-day">31</div>
+                        <div class="mini-day other-month">1</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 style="font-size: 16px; font-weight: bold; color: #1e293b; margin-bottom: 16px;">Staff Availability</h3>
+                <div class="staff-list">
+                    <div class="staff-item">
+                        <div class="staff-name">Carlos R. (Barbero 1)</div>
+                        <div class="staff-status">✅ Available</div>
+                    </div>
+                    <div class="staff-item">
+                        <div class="staff-name">Ana D. (Barbero 2)</div>
+                        <div class="staff-status">✅ Available</div>
+                    </div>
+                    <div class="staff-item">
+                        <div class="staff-name">María R. (Barbero 3)</div>
+                        <div class="staff-status">✅ Available</div>
+                    </div>
+                    <div class="staff-item">
+                        <div class="staff-name">Pedro M. (Barbero 4)</div>
+                        <div class="staff-status break">⏸️ Break</div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px; padding: 12px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #475569;">
+                    <p style="font-size: 11px; color: #475569; line-height: 1.5; margin: 0;">
+                        <strong style="display: block; margin-bottom: 4px;">💡 Múltiples Barberos</strong>
+                        Varios barberos pueden trabajar simultáneamente en el mismo horario. Las citas se muestran lado a lado en la misma celda del calendario.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nueva Cita -->
+    <div class="modal" id="modal-nueva-cita">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nueva Cita</h2>
+                <button class="modal-close" onclick="document.getElementById('modal-nueva-cita').classList.remove('show')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Buscar Cliente</label>
+                    <div class="search-client-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input 
+                            type="text" 
+                            class="search-client-input" 
+                            placeholder="Buscar por nombre, teléfono o email..."
+                            onfocus="document.getElementById('client-results').classList.add('show')"
+                            oninput="filterClients(this.value)"
+                        >
+                    </div>
+                    <div class="client-results" id="client-results">
+                        <div class="client-result-item" onclick="selectClient('Juan Pérez', '555-1234', '12')">
+                            <div class="client-result-info">
+                                <div class="client-result-name">Juan Pérez</div>
+                                <div class="client-result-contact">📞 555-1234 | 📧 juan@email.com</div>
+                            </div>
+                            <div class="client-result-visits">12 visitas</div>
+                        </div>
+                        <div class="client-result-item" onclick="selectClient('María García', '555-5678', '8')">
+                            <div class="client-result-info">
+                                <div class="client-result-name">María García</div>
+                                <div class="client-result-contact">📞 555-5678 | 📧 maria@email.com</div>
+                            </div>
+                            <div class="client-result-visits">8 visitas</div>
+                        </div>
+                        <div class="client-result-item" onclick="selectClient('Carlos López', '555-9012', '25')">
+                            <div class="client-result-info">
+                                <div class="client-result-name">Carlos López</div>
+                                <div class="client-result-contact">📞 555-9012 | 📧 carlos@email.com</div>
+                            </div>
+                            <div class="client-result-visits">25 visitas</div>
+                        </div>
+                    </div>
+                    <button class="btn-create-client" onclick="openCreateClientModal()">
+                        ➕ Crear Nuevo Cliente
+                    </button>
+                    <div class="selected-client" id="selected-client">
+                        <div class="selected-client-info">
+                            <div class="selected-client-details">
+                                <div class="selected-client-name" id="selected-client-name"></div>
+                                <div class="selected-client-contact" id="selected-client-contact"></div>
+                            </div>
+                            <button class="btn-remove-client" onclick="removeClient()">✕</button>
+                        </div>
+                    </div>
+                    <div class="auto-count-notice">
+                        ℹ️ El conteo de visitas se actualizará automáticamente al confirmar la cita
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Fecha y Hora</label>
+                    <div class="form-row">
+                        <input type="date" class="form-input" value="2024-01-15">
+                        <input type="time" class="form-input" value="10:00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Barbero</label>
+                    <select class="form-select">
+                        <option>Seleccionar barbero...</option>
+                        <option>Carlos R. (Barbero 1)</option>
+                        <option>Ana D. (Barbero 2)</option>
+                        <option>María R. (Barbero 3)</option>
+                        <option>Pedro M. (Barbero 4)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Servicio</label>
+                    <select class="form-select">
+                        <option>Seleccionar servicio...</option>
+                        <option>Corte Clásico - $200</option>
+                        <option>Corte Moderno - $250</option>
+                        <option>Barba - $150</option>
+                        <option>Corte + Barba - $350</option>
+                        <option>Tinte - $300</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Estado</label>
+                    <select class="form-select">
+                        <option>Pendiente</option>
+                        <option>Confirmada</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notas (Opcional)</label>
+                    <textarea class="form-input" rows="3" placeholder="Agregar notas adicionales..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="document.getElementById('modal-nueva-cita').classList.remove('show')">Cancelar</button>
+                <button class="btn-save" onclick="saveAppointment()">Guardar Cita</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Cliente -->
+    <div class="modal" id="modal-crear-cliente">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Crear Nuevo Cliente</h2>
+                <button class="modal-close" onclick="document.getElementById('modal-crear-cliente').classList.remove('show')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nombre Completo</label>
+                    <input type="text" class="form-input" placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input type="tel" class="form-input" placeholder="Ej: 555-1234">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email (Opcional)</label>
+                    <input type="email" class="form-input" placeholder="Ej: juan@email.com">
+                </div>
+                <div class="auto-count-notice">
+                    ℹ️ El cliente se creará y se seleccionará automáticamente para la cita
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="document.getElementById('modal-crear-cliente').classList.remove('show')">Cancelar</button>
+                <button class="btn-save" onclick="createAndSelectClient()">Crear y Seleccionar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterClients(searchTerm) {
+            const results = document.getElementById('client-results');
+            const items = results.querySelectorAll('.client-result-item');
+            
+            if (!searchTerm.trim()) {
+                items.forEach(item => item.style.display = 'block');
+                return;
+            }
+
+            const term = searchTerm.toLowerCase();
+            items.forEach(item => {
+                const name = item.querySelector('.client-result-name').textContent.toLowerCase();
+                const contact = item.querySelector('.client-result-contact').textContent.toLowerCase();
+                
+                if (name.includes(term) || contact.includes(term)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function selectClient(name, contact, visits) {
+            document.getElementById('selected-client-name').textContent = name;
+            document.getElementById('selected-client-contact').textContent = contact + ' | ' + visits + ' visitas';
+            document.getElementById('selected-client').classList.add('show');
+            document.getElementById('client-results').classList.remove('show');
+            document.querySelector('.search-client-input').value = name;
+        }
+
+        function removeClient() {
+            document.getElementById('selected-client').classList.remove('show');
+            document.querySelector('.search-client-input').value = '';
+        }
+
+        function openCreateClientModal() {
+            document.getElementById('modal-nueva-cita').classList.remove('show');
+            document.getElementById('modal-crear-cliente').classList.add('show');
+        }
+
+        function createAndSelectClient() {
+            // Simular creación de cliente
+            alert('Cliente creado exitosamente. Se seleccionará para la cita.');
+            document.getElementById('modal-crear-cliente').classList.remove('show');
+            document.getElementById('modal-nueva-cita').classList.add('show');
+            selectClient('Nuevo Cliente', '555-0000', '0');
+        }
+
+        function saveAppointment() {
+            const selectedClient = document.getElementById('selected-client-name').textContent;
+            if (!selectedClient) {
+                alert('Por favor, selecciona o crea un cliente primero.');
+                return;
+            }
+            alert('Cita guardada exitosamente. El conteo de visitas se actualizará automáticamente.');
+            document.getElementById('modal-nueva-cita').classList.remove('show');
+            // Reset form
+            removeClient();
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.getElementById('modal-nueva-cita').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('show');
+            }
+        });
+
+        document.getElementById('modal-crear-cliente').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
